@@ -159,7 +159,7 @@ export default function SignupPage() {
                 aria-checked={selected}
                 onClick={() => setRole(value)}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-xl border px-1.5 py-2.5 text-center transition-all",
+                  "flex flex-col items-center gap-1.5 cursor-pointer rounded-xl border px-1.5 py-2.5 text-center transition-all",
                   "sm:flex-row sm:gap-3 sm:px-3.5 sm:py-3 sm:text-left",
                   selected
                     ? "border-primary bg-primary/5 ring-1 ring-primary"
@@ -318,7 +318,7 @@ export default function SignupPage() {
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground cursor-pointer transition-colors hover:text-foreground"
             >
               {showPassword ? (
                 <EyeOff className="size-4" />
@@ -347,7 +347,7 @@ export default function SignupPage() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="h-11 w-full rounded-full text-sm font-semibold shadow-md shadow-primary/25"
+          className="h-11 w-full rounded-full cursor-pointer text-sm font-semibold shadow-md shadow-primary/25"
         >
           {isSubmitting ? "Creating Account..." : "Create Account"}
         </Button>
@@ -367,7 +367,7 @@ export default function SignupPage() {
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full rounded-full"
+            className="h-11 w-full cursor-pointer rounded-full"
           >
             <svg viewBox="0 0 48 48" aria-hidden="true" className="size-5">
               <path

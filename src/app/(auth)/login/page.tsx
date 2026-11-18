@@ -123,7 +123,7 @@ export default function LoginPage() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="h-11 w-full rounded-full"
+          className="h-11 w-full cursor-pointer rounded-full"
         >
           {isSubmitting ? "Signing In..." : "Sign In"}
         </Button>
@@ -140,7 +140,7 @@ export default function LoginPage() {
       <Button
         type="button"
         variant="outline"
-        className="h-11 w-full rounded-full"
+        className="h-11 w-full cursor-pointer rounded-full"
       >
         <svg viewBox="0 0 48 48" aria-hidden="true" className="size-5">
           <path
