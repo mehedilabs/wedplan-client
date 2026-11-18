@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/navbar";
 import { Toaster } from "@/components/ui/toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -33,9 +34,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${cormorant.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <Navbar />
-        {children}
-        <Toaster />
+        <TooltipProvider>
+          <Navbar />
+          {children}
+          <Toaster />
+        </TooltipProvider>
       </body>
     </html>
   );

@@ -29,10 +29,9 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await authClient.signIn.email({
+      const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
       });
 
       if (error) {
@@ -40,7 +39,22 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace("/");
+      // Determine target dashboard based on authenticated user's actual role
+      let userRole = (data?.user as { role?: string } | undefined)?.role;
+
+      if (!userRole) {
+        const sessionRes = await authClient.getSession();
+        userRole = (sessionRes?.data?.user as { role?: string } | undefined)?.role;
+      }
+
+      const targetDashboard =
+        userRole === "vendor"
+          ? "/dashboard/vendor"
+          : userRole === "admin"
+            ? "/dashboard/admin"
+            : "/dashboard/customer";
+
+      router.replace(targetDashboard);
       router.refresh();
     } catch (error) {
       setSubmitError(
@@ -60,7 +74,7 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: "/dashboard",
       });
     } catch (error) {
       setSubmitError(

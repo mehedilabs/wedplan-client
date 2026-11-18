@@ -60,10 +60,10 @@ export default function Navbar() {
 
   const dashboardHref =
     userRole === "vendor"
-      ? "/vendor/dashboard"
+      ? "/dashboard/vendor"
       : userRole === "admin"
-        ? "/admin/dashboard"
-        : "/customer/dashboard";
+        ? "/dashboard/admin"
+        : "/dashboard/customer";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -77,6 +77,11 @@ export default function Navbar() {
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  // Hide public navbar on dashboard routes so the dedicated dashboard layout takes over
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
 
   const handleLogout = async () => {
     setLogoutError("");
