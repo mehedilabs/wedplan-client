@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -48,6 +50,25 @@ export default function LoginPage() {
       );
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setSubmitError("");
+    setIsGoogleLoading(true);
+
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Google sign in failed. Please try again.",
+      );
+      setIsGoogleLoading(false);
     }
   };
 
@@ -140,6 +161,8 @@ export default function LoginPage() {
       <Button
         type="button"
         variant="outline"
+        disabled={isGoogleLoading}
+        onClick={handleGoogleLogin}
         className="h-11 w-full cursor-pointer rounded-full"
       >
         <svg viewBox="0 0 48 48" aria-hidden="true" className="size-5">
@@ -160,7 +183,7 @@ export default function LoginPage() {
             d="M24 48c6.48 0 11.93-2.13 15.92-5.86l-7.64-5.94c-2.12 1.42-4.84 2.26-8.28 2.26-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
           />
         </svg>
-        Continue with Google
+        {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
       </Button>
 
       {/* Signup Link */}
