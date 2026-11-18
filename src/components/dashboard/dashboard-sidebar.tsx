@@ -52,12 +52,7 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
   vendor: {
     label: "Vendor Portal",
     items: [
-      {
-        title: "Overview",
-        href: "/dashboard/vendor",
-        icon: LayoutDashboard,
-        isPlaceholder: false,
-      },
+      { title: "Overview", href: "/dashboard/vendor", icon: LayoutDashboard },
       {
         title: "My Services",
         href: "/dashboard/vendor/services",
@@ -68,7 +63,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Add Service",
         href: "/dashboard/vendor/add-service",
         icon: PlusCircle,
-        isPlaceholder: false,
       },
       {
         title: "Booking Requests",
@@ -97,7 +91,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Overview",
         href: "/dashboard/customer",
         icon: LayoutDashboard,
-        isPlaceholder: false,
       },
       {
         title: "My Bookings",
@@ -116,12 +109,7 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
   admin: {
     label: "Admin Portal",
     items: [
-      {
-        title: "Overview",
-        href: "/dashboard/admin",
-        icon: LayoutDashboard,
-        isPlaceholder: false,
-      },
+      { title: "Overview", href: "/dashboard/admin", icon: LayoutDashboard },
       {
         title: "Manage Users",
         href: "/dashboard/admin/users",
@@ -168,7 +156,10 @@ interface DashboardSidebarProps {
   } | null;
 }
 
-export function DashboardSidebar({ role = "customer", user }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  role = "customer",
+  user,
+}: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -180,6 +171,7 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
 
   const handlePlaceholderClick = (e: React.MouseEvent, title: string) => {
     e.preventDefault();
+
     toast.add({
       title,
       description: `${title} is scheduled for implementation in the next phase.`,
@@ -189,7 +181,17 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
 
   const handleSignOut = async () => {
     try {
-      await authClient.signOut();
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        toast.add({
+          title: "Sign out failed",
+          description: error.message || "Please try again.",
+          type: "error",
+        });
+        return;
+      }
+
       router.replace("/");
       router.refresh();
     } catch {
@@ -205,28 +207,30 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
     if (href === `/dashboard/${validatedRole}`) {
       return pathname === href;
     }
+
     return pathname.startsWith(href);
   };
 
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-border bg-sidebar text-sidebar-foreground"
+      className="border-r border-border/80 bg-sidebar text-sidebar-foreground"
     >
       {/* Brand Header */}
-      <SidebarHeader className="border-b border-border/70 p-4">
+      <SidebarHeader className="border-b border-border/70 px-4 py-5">
         <Link
-          href={`/dashboard/${validatedRole}`}
-          className="flex items-center gap-2.5 transition-opacity hover:opacity-90"
+          href={`/`}
+          className="group flex items-center gap-3 transition-opacity hover:opacity-90"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-sm shadow-primary/30">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20 ring-1 ring-primary/10">
             <Heart className="size-5 fill-primary-foreground text-primary-foreground" />
           </span>
-          <div className="flex flex-col truncate group-data-[collapsible=icon]:hidden">
-            <span className="font-heading text-xl font-bold tracking-tight text-foreground">
+
+          <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
+            <span className="font-heading text-2xl font-bold tracking-tight text-foreground">
               Wed<span className="text-primary">Plan</span>
             </span>
-            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {currentMenu.label}
             </span>
           </div>
@@ -234,13 +238,14 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
       </SidebarHeader>
 
       {/* Main Navigation */}
-      <SidebarContent className="px-2 py-3">
+      <SidebarContent className="px-3 py-5">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 text-xs font-semibold tracking-wider uppercase text-muted-foreground group-data-[collapsible=icon]:hidden">
-            Navigation
+          <SidebarGroupLabel className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground group-data-[collapsible=icon]:hidden">
+            Main Menu
           </SidebarGroupLabel>
+
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
+            <SidebarMenu className="gap-1.5">
               {currentMenu.items.map((item) => {
                 const active = isItemActive(item.href);
                 const Icon = item.icon;
@@ -253,15 +258,15 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
                         isActive={active}
                         tooltip={item.title}
                         className={cn(
-                          "cursor-pointer rounded-xl font-medium transition-colors",
+                          "h-11 rounded-xl px-3 text-sm font-medium transition-all duration-200",
                           active
-                            ? "bg-primary text-primary-foreground"
-                            : "text-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                            ? "bg-primary text-primary-foreground shadow-md shadow-primary/15"
+                            : "text-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                         )}
                       >
-                        <Icon className="size-4 shrink-0" />
+                        <Icon className="size-[18px] shrink-0" />
                         <span className="truncate">{item.title}</span>
-                        <SidebarMenuBadge className="rounded-full bg-muted/80 px-1.5 py-0.5 text-[10px] text-muted-foreground group-data-[collapsible=icon]:hidden">
+                        <SidebarMenuBadge className="rounded-full border border-border/70 bg-background/80 px-2 py-0.5 text-[9px] font-semibold text-muted-foreground group-data-[collapsible=icon]:hidden">
                           Soon
                         </SidebarMenuBadge>
                       </SidebarMenuButton>
@@ -271,13 +276,13 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
                         isActive={active}
                         tooltip={item.title}
                         className={cn(
-                          "rounded-xl font-medium transition-colors",
+                          "h-11 rounded-xl px-3 text-sm font-medium transition-all duration-200",
                           active
-                            ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                            : "text-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                            ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/15 hover:bg-primary/90 hover:text-primary-foreground"
+                            : "text-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                         )}
                       >
-                        <Icon className="size-4 shrink-0" />
+                        <Icon className="size-[18px] shrink-0" />
                         <span className="truncate">{item.title}</span>
                       </SidebarMenuButton>
                     )}
@@ -287,79 +292,58 @@ export function DashboardSidebar({ role = "customer", user }: DashboardSidebarPr
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Quick Portal Switch / Website Link */}
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel className="px-2 text-xs font-semibold tracking-wider uppercase text-muted-foreground group-data-[collapsible=icon]:hidden">
-            Shortcuts
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={<Link href="/" />}
-                  tooltip="Back to Website"
-                  className="rounded-xl text-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                >
-                  <Globe className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="truncate">View Public Site</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarSeparator />
 
-      {/* User Profile & Actions Footer */}
+      {/* Profile Footer */}
       <SidebarFooter className="p-3">
-        <div className="flex flex-col gap-2">
-          {/* User info card */}
-          <div className="flex items-center gap-3 rounded-xl bg-background/80 p-2.5 border border-border/80">
+        <div className="rounded-2xl border border-border/80 bg-background/80 p-3 shadow-sm">
+          <div className="flex items-center gap-3">
             {user?.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.image}
                 alt={user.name || "User profile"}
-                className="size-9 shrink-0 rounded-full object-cover"
+                referrerPolicy="no-referrer"
+                className="size-10 shrink-0 rounded-xl object-cover ring-1 ring-border"
               />
             ) : (
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary ring-1 ring-primary/10">
+                {user?.name?.trim().charAt(0).toUpperCase() || "U"}
               </span>
             )}
 
             <div className="flex min-w-0 flex-1 flex-col group-data-[collapsible=icon]:hidden">
-              <span className="truncate text-xs font-semibold text-foreground">
+              <span className="truncate text-xs font-bold text-foreground">
                 {user?.name || "WedPlan User"}
               </span>
-              <span className="truncate text-[11px] text-muted-foreground">
+              <span className="truncate text-[10px] text-muted-foreground">
                 {user?.email || "user@wedplan.com"}
               </span>
+
               <span
                 className={cn(
-                  "mt-1 w-fit inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium leading-none",
+                  "mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-1 text-[9px] font-bold uppercase tracking-wide",
                   roleBadge.className,
                 )}
               >
-                <Sparkles className="size-2.5" />
+                <Sparkles className="size-3" />
                 {roleBadge.label}
               </span>
             </div>
           </div>
-
-          {/* Sign Out Button */}
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10 cursor-pointer group-data-[collapsible=icon]:justify-center"
-            title="Sign Out"
-          >
-            <LogOut className="size-4 shrink-0" />
-            <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
-          </button>
         </div>
+
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="mt-2 flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 text-xs font-semibold text-destructive transition-all hover:bg-destructive/10 group-data-[collapsible=icon]:justify-center"
+          title="Sign Out"
+        >
+          <LogOut className="size-4 shrink-0" />
+          <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
+        </button>
       </SidebarFooter>
 
       <SidebarRail />
