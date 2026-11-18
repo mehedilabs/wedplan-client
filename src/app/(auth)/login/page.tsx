@@ -1,10 +1,56 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: "/",
+      });
+
+      if (error) {
+        setSubmitError(error.message || "Unable to sign in.");
+        return;
+      }
+
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
       {/* Header */}
@@ -23,7 +69,7 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form */}
-      <form className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
           <label htmlFor="email" className="text-sm font-medium">
             Email Address
@@ -31,9 +77,11 @@ export default function LoginPage() {
 
           <Input
             id="email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            required
           />
         </div>
 
@@ -44,9 +92,11 @@ export default function LoginPage() {
 
           <Input
             id="password"
+            name="password"
             type="password"
             placeholder="Enter your password"
             autoComplete="current-password"
+            required
           />
         </div>
 
@@ -59,8 +109,23 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" className="h-11 w-full rounded-full">
-          Sign In
+        {/* Error Message */}
+        {submitError && (
+          <p
+            role="alert"
+            className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            {submitError}
+          </p>
+        )}
+
+        {/* Submit */}
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-11 w-full rounded-full"
+        >
+          {isSubmitting ? "Signing In..." : "Sign In"}
         </Button>
       </form>
 

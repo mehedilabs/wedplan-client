@@ -7,6 +7,8 @@ import { Heart, UserRound, Store, Camera, X, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 type AccountRole = "customer" | "vendor";
 
@@ -34,6 +36,10 @@ const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
 
 export default function SignupPage() {
+  const router = useRouter();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [role, setRole] = useState<AccountRole>("customer");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoError, setPhotoError] = useState("");
@@ -79,9 +85,43 @@ export default function SignupPage() {
     resetPhotoInput();
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO:
+
+    const formData = new FormData(event.currentTarget);
+
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        role,
+        callbackURL: "/",
+      });
+
+      if (error) {
+        setSubmitError(error.message || "Unable to create account.");
+        return;
+      }
+
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -293,12 +333,23 @@ export default function SignupPage() {
           </p>
         </div>
 
+        {/* Error Message */}
+        {submitError && (
+          <p
+            role="alert"
+            className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            {submitError}
+          </p>
+        )}
+
         {/* Submit */}
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="h-11 w-full rounded-full text-sm font-semibold shadow-md shadow-primary/25"
         >
-          Create Account
+          {isSubmitting ? "Creating Account..." : "Create Account"}
         </Button>
       </form>
 

@@ -14,5 +14,18 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 6,
+    autoSignIn: true,
+  },
+
+  user: {
+    additionalFields: {
+      role: {
+        type: ["customer", "vendor"],
+        required: true,
+        defaultValue: "customer",
+        input: true,
+      },
+    },
   },
 });
