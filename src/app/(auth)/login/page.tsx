@@ -143,7 +143,7 @@ export default function LoginPage() {
         {/* Submit */}
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isGoogleLoading}
           className="h-11 w-full cursor-pointer rounded-full"
         >
           {isSubmitting ? "Signing In..." : "Sign In"}
@@ -161,7 +161,7 @@ export default function LoginPage() {
       <Button
         type="button"
         variant="outline"
-        disabled={isGoogleLoading}
+        disabled={isGoogleLoading || isSubmitting}
         onClick={handleGoogleLogin}
         className="h-11 w-full cursor-pointer rounded-full"
       >
