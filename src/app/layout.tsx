@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/navbar";
+import { Toaster } from "@/components/ui/toast";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <Navbar />
         {children}
+        <Toaster />
       </body>
     </html>
   );
