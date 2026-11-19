@@ -237,6 +237,8 @@ export default function AddServiceForm() {
 
       await createService({
         vendorId: session.user.id,
+        vendorName: session.user.name,
+        vendorEmail: session.user.email,
         serviceName: String(formData.get("serviceName")).trim(),
         category: String(formData.get("category")),
         description: String(formData.get("description")).trim(),
@@ -244,7 +246,6 @@ export default function AddServiceForm() {
         location: String(formData.get("location")).trim(),
         images: imageUrls,
       });
-
       toast.add({
         title: "Service submitted!",
         description:

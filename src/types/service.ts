@@ -3,6 +3,8 @@ export type ServiceStatus = "pending" | "approved" | "rejected";
 export interface Service {
   _id: string;
   vendorId: string;
+  vendorName: string;
+  vendorEmail: string;
   serviceName: string;
   category: string;
   description: string;

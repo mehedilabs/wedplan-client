@@ -21,6 +21,8 @@ interface ImageUploadData {
 
 interface CreateServiceData {
   vendorId: string;
+  vendorName: string;
+  vendorEmail: string;
   serviceName: string;
   category: string;
   description: string;
