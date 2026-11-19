@@ -57,7 +57,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "My Services",
         href: "/dashboard/vendor/services",
         icon: Briefcase,
-        isPlaceholder: true,
       },
       {
         title: "Add Service",

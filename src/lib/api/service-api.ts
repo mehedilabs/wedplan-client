@@ -52,6 +52,36 @@ export async function getServices(): Promise<Service[]> {
   return result.data;
 }
 
+
+ // Get all services created by a specific vendor
+export async function getVendorServices(
+  vendorId: string,
+): Promise<Service[]> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const response = await fetch(
+    `${API_URL}/services/vendor/${encodeURIComponent(vendorId)}`,
+    {
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch vendor services");
+  }
+
+  const result: ServicesResponse = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message);
+  }
+
+  return result.data;
+}
+
+
 // Upload a single service image to ImgBB
 export async function uploadServiceImage(file: File): Promise<string> {
   if (!API_URL) {
