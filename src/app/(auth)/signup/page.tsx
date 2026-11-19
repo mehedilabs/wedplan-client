@@ -97,6 +97,7 @@ export default function SignupPage() {
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
+    const businessName = String(formData.get("businessName") ?? "").trim();
 
     setSubmitError("");
     setIsSubmitting(true);
@@ -107,6 +108,7 @@ export default function SignupPage() {
         email,
         password,
         role,
+        ...(role === "vendor" && { businessName }),
         callbackURL: "/",
       });
 
@@ -303,6 +305,25 @@ export default function SignupPage() {
             required
           />
         </div>
+
+        {/* Business / Studio Name */}
+        {role === "vendor" && (
+          <div className="space-y-1.5">
+            <label htmlFor="businessName" className="text-sm font-semibold">
+              Business / Studio Name
+            </label>
+
+            <Input
+              id="businessName"
+              name="businessName"
+              type="text"
+              placeholder="Your business or studio name"
+              autoComplete="organization"
+              className="h-11"
+              required
+            />
+          </div>
+        )}
 
         {/* Email */}
         <div className="space-y-1.5">

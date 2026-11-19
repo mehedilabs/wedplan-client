@@ -237,7 +237,7 @@ export default function AddServiceForm() {
 
       await createService({
         vendorId: session.user.id,
-        vendorName: session.user.name,
+        vendorName: session.user.businessName || session.user.name,
         vendorEmail: session.user.email,
         serviceName: String(formData.get("serviceName")).trim(),
         category: String(formData.get("category")),

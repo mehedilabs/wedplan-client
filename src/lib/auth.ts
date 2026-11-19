@@ -29,14 +29,19 @@ export const auth = betterAuth({
   },
 
   user: {
-    additionalFields: {
-      role: {
-        type: ["customer", "vendor", "admin"],
-        required: true,
-        defaultValue: "customer",
-        input: true,
-      },
-    },
+   additionalFields: {
+  role: {
+    type: ["customer", "vendor", "admin"],
+    required: true,
+    defaultValue: "customer",
+    input: true,
+  },
+  businessName: {
+    type: "string",
+    required: false,
+    input: true,
+  },
+},
   },
 
   databaseHooks: {
