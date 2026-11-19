@@ -10,7 +10,11 @@ export default function Home() {
     <main>
       <HeroSection />
 
-      <CategoriesSection />
+      <Suspense
+        fallback={<div className="min-h-[700px] animate-pulse bg-background" />}
+      >
+        <CategoriesSection />
+      </Suspense>
 
       <Suspense fallback={<FeaturedServicesSkeleton />}>
         <FeaturedServicesSection />

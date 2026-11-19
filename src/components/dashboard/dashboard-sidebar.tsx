@@ -95,7 +95,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "My Bookings",
         href: "/dashboard/customer/bookings",
         icon: CalendarDays,
-        isPlaceholder: true,
       },
       {
         title: "Profile Settings",
