@@ -54,6 +54,30 @@ export async function getServices(): Promise<Service[]> {
   return result.data;
 }
 
+// Get a single service by ID
+export async function getServiceById(
+  serviceId: string,
+): Promise<Service> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const response = await fetch(
+    `${API_URL}/services/${encodeURIComponent(serviceId)}`,
+    {
+      cache: "no-store",
+    },
+  );
+
+  const result: ApiResponse<Service> = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to fetch service details");
+  }
+
+  return result.data;
+}
+
 
  // Get all services created by a specific vendor
 export async function getVendorServices(
