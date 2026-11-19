@@ -1,8 +1,8 @@
 import { getServices } from "@/lib/api/service-api";
-import ServicesGrid from "./services-grid";
+import ServicesExplorer from "./services-explorer";
 
 export default async function ServicesContent() {
   const services = await getServices();
 
-  return <ServicesGrid services={services} />;
+  return <ServicesExplorer initialServices={services} />;
 }
