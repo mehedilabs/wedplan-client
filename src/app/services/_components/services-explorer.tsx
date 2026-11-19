@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
@@ -9,6 +9,7 @@ import {
   ChevronDown,
   RotateCcw,
   SearchX,
+  X,
 } from "lucide-react";
 
 import type { Service } from "@/types/service";
@@ -33,19 +34,19 @@ export default function ServicesExplorer({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Active filters from URL query parameters (source of truth)
+  // Read current URL query parameters (source of truth on mount & popstate)
   const urlSearch = searchParams.get("search") || "";
   const urlCategory = searchParams.get("category") || "All Categories";
   const urlLocation = searchParams.get("location") || "";
   const urlSort = searchParams.get("sort") || "newest";
 
-  // Local form state
+  // Local state for immediate, lag-free UI filtering as the user types or selects
   const [searchTerm, setSearchTerm] = useState(urlSearch);
   const [selectedCategory, setSelectedCategory] = useState(urlCategory);
   const [locationTerm, setLocationTerm] = useState(urlLocation);
   const [selectedSort, setSelectedSort] = useState(urlSort);
 
-  // Synchronize local form inputs when URL parameters change (e.g. browser back/forward or category clicks)
+  // Synchronize local states when the URL changes externally (e.g. browser back/forward or category clicks from Home)
   useEffect(() => {
     setSearchTerm(urlSearch);
     setSelectedCategory(urlCategory);
@@ -53,13 +54,77 @@ export default function ServicesExplorer({
     setSelectedSort(urlSort);
   }, [urlSearch, urlCategory, urlLocation, urlSort]);
 
-  // Apply filters and sorting to the dynamically fetched services
+  // Synchronize state to URL query parameters
+  const updateUrl = useCallback(
+    (
+      newSearch: string,
+      newCategory: string,
+      newLocation: string,
+      newSort: string,
+    ) => {
+      const params = new URLSearchParams();
+
+      if (newSearch.trim()) {
+        params.set("search", newSearch.trim());
+      }
+      if (newCategory && newCategory !== "All Categories") {
+        params.set("category", newCategory);
+      }
+      if (newLocation.trim()) {
+        params.set("location", newLocation.trim());
+      }
+      if (newSort && newSort !== "newest") {
+        params.set("sort", newSort);
+      }
+
+      const queryString = params.toString();
+      const currentQueryString = searchParams.toString();
+
+      // Only push/replace when query string actually changes to prevent redundant updates and infinite loops
+      if (queryString !== currentQueryString) {
+        const targetPath = queryString ? `/services?${queryString}` : "/services";
+        router.replace(targetPath, { scroll: false });
+      }
+    },
+    [router, searchParams],
+  );
+
+  // Debounced URL synchronization for text inputs (keyword search and location)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateUrl(searchTerm, selectedCategory, locationTerm, selectedSort);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, locationTerm, selectedCategory, selectedSort, updateUrl]);
+
+  // Instant update handlers for category & sort dropdown selections
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    updateUrl(searchTerm, category, locationTerm, selectedSort);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSelectedSort(sort);
+    updateUrl(searchTerm, selectedCategory, locationTerm, sort);
+  };
+
+  // Reset all filters and clear query parameters
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("All Categories");
+    setLocationTerm("");
+    setSelectedSort("newest");
+    router.replace("/services", { scroll: false });
+  };
+
+  // Compute filtered services dynamically based on current live filter values
   const filteredServices = useMemo(() => {
-    const searchNormalized = urlSearch.toLowerCase().trim();
-    const locationNormalized = urlLocation.toLowerCase().trim();
+    const searchNormalized = searchTerm.toLowerCase().trim();
+    const locationNormalized = locationTerm.toLowerCase().trim();
 
     const result = initialServices.filter((service) => {
-      // 1. Keyword search: match against serviceName or description
+      // 1. Live Keyword search (matches serviceName or description)
       if (searchNormalized) {
         const nameMatch = service.serviceName
           ?.toLowerCase()
@@ -70,12 +135,12 @@ export default function ServicesExplorer({
         if (!nameMatch && !descMatch) return false;
       }
 
-      // 2. Category filter
-      if (urlCategory && urlCategory !== "All Categories") {
-        if (service.category !== urlCategory) return false;
+      // 2. Live Category filter
+      if (selectedCategory && selectedCategory !== "All Categories") {
+        if (service.category !== selectedCategory) return false;
       }
 
-      // 3. Location filter: case-insensitive match
+      // 3. Live Location filter (case-insensitive substring)
       if (locationNormalized) {
         const locMatch = service.location
           ?.toLowerCase()
@@ -86,12 +151,12 @@ export default function ServicesExplorer({
       return true;
     });
 
-    // 4. Sorting
+    // 4. Live Sorting
     result.sort((a, b) => {
-      if (urlSort === "price-low") {
+      if (selectedSort === "price-low") {
         return a.price - b.price;
       }
-      if (urlSort === "price-high") {
+      if (selectedSort === "price-high") {
         return b.price - a.price;
       }
       // Default: Featured & Newest (newest first based on createdAt)
@@ -101,75 +166,53 @@ export default function ServicesExplorer({
     });
 
     return result;
-  }, [initialServices, urlSearch, urlCategory, urlLocation, urlSort]);
-
-  // Apply search/filter and update URL query parameters
-  const handleSearchSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-
-    const params = new URLSearchParams();
-
-    if (searchTerm.trim()) {
-      params.set("search", searchTerm.trim());
-    }
-
-    if (selectedCategory && selectedCategory !== "All Categories") {
-      params.set("category", selectedCategory);
-    }
-
-    if (locationTerm.trim()) {
-      params.set("location", locationTerm.trim());
-    }
-
-    if (selectedSort && selectedSort !== "newest") {
-      params.set("sort", selectedSort);
-    }
-
-    const queryString = params.toString();
-    router.push(queryString ? `/services?${queryString}` : "/services");
-  };
-
-  // Reset all filters and remove query parameters
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setSelectedCategory("All Categories");
-    setLocationTerm("");
-    setSelectedSort("newest");
-    router.push("/services");
-  };
+  }, [
+    initialServices,
+    searchTerm,
+    selectedCategory,
+    locationTerm,
+    selectedSort,
+  ]);
 
   const hasActiveFilters = Boolean(
-    urlSearch ||
-      (urlCategory && urlCategory !== "All Categories") ||
-      urlLocation ||
-      (urlSort && urlSort !== "newest"),
+    searchTerm ||
+      (selectedCategory && selectedCategory !== "All Categories") ||
+      locationTerm ||
+      (selectedSort && selectedSort !== "newest"),
   );
 
   return (
     <div className="space-y-8">
-      {/* Search and Filter Bar Card */}
-      <form
-        onSubmit={handleSearchSubmit}
-        className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-3.5"
-      >
-        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
-          {/* Keyword Search */}
-          <div className="relative flex-1">
+      {/* Live Search and Filter Bar Card (No Search button needed) */}
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-3.5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {/* 1. Live Keyword Search */}
+          <div className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search service name or keyword..."
-              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10"
+              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-9 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                aria-label="Clear search keyword"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
 
-          {/* Category Dropdown */}
-          <div className="relative w-full lg:w-48">
+          {/* 2. Live Category Filter */}
+          <div className="relative">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-3.5 pr-9 text-sm text-foreground outline-none transition-all hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10 cursor-pointer"
             >
               <option value="All Categories">All Categories</option>
@@ -182,24 +225,34 @@ export default function ServicesExplorer({
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
 
-          {/* Location Filter */}
-          <div className="relative w-full lg:w-52">
+          {/* 3. Live Location Filter */}
+          <div className="relative">
             <MapPin className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={locationTerm}
               onChange={(e) => setLocationTerm(e.target.value)}
               placeholder="Filter by city / location..."
-              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3.5 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10"
+              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-9 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground/70 hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
+            {locationTerm && (
+              <button
+                type="button"
+                onClick={() => setLocationTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                aria-label="Clear location filter"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
 
-          {/* Sorting Dropdown */}
-          <div className="relative w-full lg:w-48">
+          {/* 4. Live Sorting */}
+          <div className="relative">
             <SlidersHorizontal className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <select
               value={selectedSort}
-              onChange={(e) => setSelectedSort(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="h-11 w-full appearance-none rounded-xl border border-border bg-background pl-10 pr-9 text-sm text-foreground outline-none transition-all hover:border-primary/40 focus:border-primary focus:ring-2 focus:ring-primary/10 cursor-pointer"
             >
               <option value="newest">Featured & Newest</option>
@@ -208,18 +261,10 @@ export default function ServicesExplorer({
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
-
-          {/* Search Button */}
-          <button
-            type="submit"
-            className="h-11 w-full shrink-0 rounded-xl bg-primary px-7 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow cursor-pointer lg:w-auto"
-          >
-            Search
-          </button>
         </div>
-      </form>
+      </div>
 
-      {/* Results Meta Info */}
+      {/* Live Results Meta Counter */}
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
         <p>
           Showing{" "}
@@ -227,7 +272,7 @@ export default function ServicesExplorer({
             {filteredServices.length}
           </span>{" "}
           {filteredServices.length === 1 ? "service" : "services"}
-          {hasActiveFilters && " matching your criteria"}
+          {hasActiveFilters && " matching your filters"}
         </p>
 
         {hasActiveFilters && (
@@ -250,7 +295,7 @@ export default function ServicesExplorer({
           ))}
         </div>
       ) : initialServices.length === 0 ? (
-        /* Entire marketplace is currently empty */
+        /* Entire marketplace is empty */
         <div className="rounded-2xl border border-dashed border-border bg-card/60 px-6 py-16 text-center">
           <h2 className="font-heading text-2xl font-semibold text-foreground">
             No Services Available

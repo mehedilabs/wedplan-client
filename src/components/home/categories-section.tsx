@@ -1,59 +1,100 @@
-import Image from "next/image";
 import Link from "next/link";
 
-interface CategoryItem {
+import { getServices } from "@/lib/api/service-api";
+import type { Service } from "@/types/service";
+import { CategoryCardImage } from "./category-card-image";
+
+interface CategoryDefinition {
   name: string;
   badge: string;
   description: string;
-  image: string;
+  fallbackImage: string;
 }
 
-const categories: CategoryItem[] = [
+const CATEGORIES: CategoryDefinition[] = [
   {
     name: "Photography & Videography",
     badge: "Cinematic Capture",
     description:
       "Timeless editorial storytelling, drone films & candid moments",
-    image: "/images/categories/photography.jpg",
+    fallbackImage: "/images/categories/photography.jpg",
   },
   {
     name: "Wedding Venues",
     badge: "Curated Spaces",
     description:
       "Historic estates, garden conservatories & luxury ballrooms",
-    image: "/images/categories/venues.jpg",
+    fallbackImage: "/images/categories/venues.jpg",
   },
   {
     name: "Decoration & Florist",
     badge: "Botanical Artistry",
     description:
       "Bespoke floral arches, candlelit tablescapes & dreamy styling",
-    image: "/images/categories/decoration.jpg",
+    fallbackImage: "/images/categories/decoration.jpg",
   },
   {
     name: "Catering Services",
     badge: "Culinary Excellence",
     description:
       "Chef-crafted tasting menus, patisserie & craft beverage bars",
-    image: "/images/categories/catering.jpg",
+    fallbackImage: "/images/categories/catering.jpg",
   },
   {
     name: "Makeup & Styling",
     badge: "Bridal Glamour",
     description:
       "Radiant bridal beauty, hair artistry & on-site touch-up teams",
-    image: "/images/categories/makeup.jpg",
+    fallbackImage: "/images/categories/makeup.jpg",
   },
   {
     name: "Wedding Fashion",
     badge: "Atelier Couture",
     description:
       "Couture bridal gowns, bespoke tuxedos & heirloom accessories",
-    image: "/images/categories/fashion.jpg",
+    fallbackImage: "/images/categories/fashion.jpg",
   },
 ];
 
-export default function CategoriesSection() {
+export default async function CategoriesSection() {
+  let services: Service[] = [];
+
+  try {
+    services = await getServices();
+  } catch (error) {
+    console.error("Failed to load services for category images:", error);
+  }
+
+  // Filter only approved and active services from the backend API
+  const approvedActiveServices = services.filter(
+    (service) => service.status === "approved" && service.isActive === true,
+  );
+
+  // Map each category to the newest service's image, or its permanent static fallback
+  const categoriesWithDisplayImage = CATEGORIES.map((category) => {
+    // Find all approved & active services belonging to this category
+    const matchingServices = approvedActiveServices
+      .filter((service) => service.category === category.name)
+      .sort((a, b) => {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return timeB - timeA;
+      });
+
+    // Pick newest service
+    const newestService = matchingServices[0];
+
+    // Find the first valid image URL in the newest service
+    const dynamicImage = newestService?.images?.find(
+      (img) => typeof img === "string" && img.trim().length > 0,
+    );
+
+    return {
+      ...category,
+      displayImage: dynamicImage || category.fallbackImage,
+    };
+  });
+
   return (
     <section className="relative isolate overflow-hidden bg-background px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
       {/* Decorative ambient background glows */}
@@ -79,19 +120,17 @@ export default function CategoriesSection() {
 
         {/* 6 Category Cards Grid */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-7">
-          {categories.map((category) => (
+          {categoriesWithDisplayImage.map((category) => (
             <Link
               key={category.name}
               href={`/services?category=${encodeURIComponent(category.name)}`}
               className="group relative flex aspect-[16/11] w-full flex-col justify-end overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 sm:aspect-[16/10]"
             >
-              {/* Background Image */}
-              <Image
-                src={category.image}
+              {/* Category Image with automatic fallback */}
+              <CategoryCardImage
+                src={category.displayImage}
+                fallbackSrc={category.fallbackImage}
                 alt={category.name}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
 
               {/* Dark Gradients for Crisp Text Readability */}
