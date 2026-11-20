@@ -31,6 +31,16 @@ interface CreateServiceData {
   images: string[];
 }
 
+interface UpdateServiceData {
+  vendorId: string;
+  serviceName: string;
+  category: string;
+  description: string;
+  price: number;
+  location: string;
+  images: string[];
+}
+
 // Get all approved and active services
 export async function getServices(): Promise<Service[]> {
   if (!API_URL) {
@@ -151,5 +161,60 @@ export async function createService(
 
   if (!response.ok || !result.success) {
     throw new Error(result.message || "Failed to create service");
+  }
+}
+
+
+// Update an existing service
+export async function updateService(
+  serviceId: string,
+  serviceData: UpdateServiceData,
+): Promise<void> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const response = await fetch(
+    `${API_URL}/services/${encodeURIComponent(serviceId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(serviceData),
+    },
+  );
+
+  const result: ApiResponse<unknown> = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to update service");
+  }
+}
+
+// Delete an existing service
+export async function deleteService(
+  serviceId: string,
+  vendorId: string,
+): Promise<void> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const response = await fetch(
+    `${API_URL}/services/${encodeURIComponent(serviceId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ vendorId }),
+    },
+  );
+
+  const result: ApiResponse<unknown> = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to delete service");
   }
 }

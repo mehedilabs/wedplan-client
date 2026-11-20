@@ -9,11 +9,17 @@ import {
   CalendarDays,
   RefreshCw,
   PackageOpen,
+  Pencil,
+  Trash2,
+  LoaderCircle,
+  X,
 } from "lucide-react";
+import { toast } from "@/components/ui/toast";
 
 import { authClient } from "@/lib/auth-client";
-import { getVendorServices } from "@/lib/api/service-api";
+import { getVendorServices, deleteService } from "@/lib/api/service-api";
 import { Button } from "@/components/ui/button";
+import EditServiceDialog from "./_components/edit-service-dialog";
 import type { Service } from "@/types/service";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +64,10 @@ export default function VendorServicesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [deletingService, setDeletingService] = useState<Service | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const fetchServices = useCallback(async () => {
     if (isPending) return;
 
@@ -93,6 +103,37 @@ export default function VendorServicesPage() {
     void loadServices();
   }, [fetchServices]);
 
+  async function handleDeleteService() {
+    if (!deletingService || !userId) return;
+
+    setIsDeleting(true);
+
+    try {
+      await deleteService(deletingService._id, userId);
+
+      toast.add({
+        title: "Service Deleted",
+        description: "Your service has been deleted successfully.",
+        type: "success",
+      });
+
+      setDeletingService(null);
+
+      await fetchServices();
+    } catch (error) {
+      toast.add({
+        title: "Delete Failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete service. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -126,6 +167,7 @@ export default function VendorServicesPage() {
       {!isLoading && !error && (
         <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
           <Store className="size-4 text-primary" />
+
           <p className="text-sm text-muted-foreground">
             You have{" "}
             <span className="font-semibold text-foreground">
@@ -145,6 +187,7 @@ export default function VendorServicesPage() {
               className="overflow-hidden rounded-2xl border border-border bg-card"
             >
               <div className="aspect-[16/10] animate-pulse bg-muted" />
+
               <div className="space-y-3 p-5">
                 <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
                 <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
@@ -284,9 +327,123 @@ export default function VendorServicesPage() {
                     {formatDate(service.createdAt)}
                   </span>
                 </div>
+
+                {/* Service Actions */}
+                <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                  <Button
+                    variant="outline"
+                    className="rounded-xl cursor-pointer"
+                    onClick={() => setEditingService(service)}
+                  >
+                    <Pencil className="mr-2 size-4" />
+                    Edit
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive cursor-pointer"
+                    onClick={() => setDeletingService(service)}
+                  >
+                    <Trash2 className="mr-2 size-4" />
+                    Delete
+                  </Button>
+                </div>
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {/* Edit Service Dialog */}
+      {editingService && userId && (
+        <EditServiceDialog
+          service={editingService}
+          vendorId={userId}
+          onClose={() => setEditingService(null)}
+          onUpdated={() => void fetchServices()}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingService && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isDeleting) {
+              setDeletingService(null);
+            }
+          }}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-service-title"
+            aria-describedby="delete-service-description"
+            className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-2xl"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                <Trash2 className="size-5" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDeletingService(null)}
+                disabled={isDeleting}
+                className="flex size-8 items-center justify-center cursor-pointer rounded-full text-muted-foreground transition hover:bg-muted disabled:opacity-50"
+                aria-label="Close delete confirmation"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <h2
+              id="delete-service-title"
+              className="mt-4 font-heading text-xl font-bold text-foreground"
+            >
+              Delete Service?
+            </h2>
+
+            <p
+              id="delete-service-description"
+              className="mt-2 text-sm leading-6 text-muted-foreground"
+            >
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-foreground">
+                {deletingService.serviceName}
+              </span>
+              ? This action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="outline"
+                className="rounded-full cursor-pointer"
+                disabled={isDeleting}
+                onClick={() => setDeletingService(null)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                className="rounded-full bg-destructive cursor-pointer text-white hover:bg-destructive/90"
+                disabled={isDeleting}
+                onClick={() => void handleDeleteService()}
+              >
+                {isDeleting ? (
+                  <>
+                    <LoaderCircle className="mr-2 size-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 size-4" />
+                    Delete Service
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
