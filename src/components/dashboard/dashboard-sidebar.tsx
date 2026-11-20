@@ -67,7 +67,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Booking Requests",
         href: "/dashboard/vendor/bookings",
         icon: CalendarCheck,
-        isPlaceholder: true,
       },
       {
         title: "Subscription",

@@ -63,7 +63,7 @@ export function DashboardHeader({
           <SidebarTrigger
             aria-label="Toggle sidebar"
             className={cn(
-              "flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11",
+              "flex size-10 shrink-0 items-center cursor-pointer justify-center rounded-xl sm:size-11",
               "border border-border bg-card text-primary shadow-sm",
               "transition-all duration-200",
               "hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10",
