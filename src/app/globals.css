@@ -184,3 +184,22 @@
     font: inherit;
   }
 }
+
+
+@keyframes pulse-ring {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  10% {
+    opacity: 0.6;
+  }
+  60% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}

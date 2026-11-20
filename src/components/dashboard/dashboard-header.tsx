@@ -60,18 +60,27 @@ export function DashboardHeader({
       <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-3 px-3 sm:h-[72px] sm:gap-4 sm:px-5 lg:px-8">
         {/* ---------- Left: Sidebar trigger + page info ---------- */}
         <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
-          <SidebarTrigger
-            aria-label="Toggle sidebar"
-            className={cn(
-              "flex size-10 shrink-0 items-center cursor-pointer justify-center rounded-xl sm:size-11",
-              "border border-border bg-card text-primary shadow-sm",
-              "transition-all duration-200",
-              "hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10",
-              "active:translate-y-0 active:scale-95",
-              "[&_svg]:size-5",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-            )}
-          />
+          {/* ============ 🎯 SIDEBAR BUTTON + 2.5s PULSE ============ */}
+          <div className="relative shrink-0">
+            {/* 2.5s পর পর একবার pulse ring */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-xl bg-primary/40 opacity-0 [animation:pulse-ring_2.5s_ease-out_infinite]"
+            />
+
+            <SidebarTrigger
+              aria-label="Toggle sidebar"
+              className={cn(
+                "relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl sm:size-11",
+                "border border-border bg-card text-primary shadow-sm",
+                "transition-all duration-200",
+                "hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10",
+                "active:translate-y-0 active:scale-95",
+                "[&_svg]:size-5",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+              )}
+            />
+          </div>
 
           <div className="hidden h-9 w-px shrink-0 bg-gradient-to-b from-transparent via-border to-transparent sm:block" />
 

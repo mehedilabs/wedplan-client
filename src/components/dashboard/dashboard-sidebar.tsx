@@ -178,30 +178,6 @@ export function DashboardSidebar({
     });
   };
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await authClient.signOut();
-
-      if (error) {
-        toast.add({
-          title: "Sign out failed",
-          description: error.message || "Please try again.",
-          type: "error",
-        });
-        return;
-      }
-
-      router.replace("/");
-      router.refresh();
-    } catch {
-      toast.add({
-        title: "Sign out failed",
-        description: "Please try again.",
-        type: "error",
-      });
-    }
-  };
-
   const isItemActive = (href: string) => {
     if (href === `/dashboard/${validatedRole}`) {
       return pathname === href;
@@ -333,16 +309,6 @@ export function DashboardSidebar({
             </div>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="mt-2 flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 text-xs font-semibold text-destructive transition-all hover:bg-destructive/10 group-data-[collapsible=icon]:justify-center"
-          title="Sign Out"
-        >
-          <LogOut className="size-4 shrink-0" />
-          <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
-        </button>
       </SidebarFooter>
 
       <SidebarRail />
