@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 
 import { getServiceById } from "@/lib/api/service-api";
@@ -12,6 +13,8 @@ interface ServiceDetailsPageProps {
 export default async function ServiceDetailsPage({
   params,
 }: ServiceDetailsPageProps) {
+  await connection();
+
   const { id } = await params;
 
   let service;
