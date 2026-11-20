@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Images, MapPin } from "lucide-react";
+import { ArrowUpRight, Crown, Images, MapPin } from "lucide-react";
 
 import type { Service } from "@/types/service";
 
@@ -11,12 +11,23 @@ interface ServiceCardProps {
 export default function ServiceCard({ service }: ServiceCardProps) {
   const imageCount = service.images?.length ?? 0;
 
-  // ⚠️ তোমার Service type-এ vendor-এর email যে field-এ আছে সেটা এখানে বসাও
   const vendorName: string | undefined = service.vendorName;
   const vendorInitial = vendorName?.charAt(0).toUpperCase() ?? "V";
+  const isPremium = Boolean(service.isPremium);
 
   return (
-    <article className="group relative h-full overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent/60 hover:shadow-2xl hover:shadow-primary/15">
+    <article
+      className={`group relative h-full overflow-hidden rounded-3xl border bg-card p-3 transition-all duration-500 hover:-translate-y-2 ${
+        isPremium
+          ? "border-accent/60 shadow-lg shadow-accent/15 ring-1 ring-accent/20 hover:border-accent hover:shadow-2xl hover:shadow-accent/25"
+          : "border-border shadow-sm hover:border-accent/60 hover:shadow-2xl hover:shadow-primary/15"
+      }`}
+    >
+      {/* Premium: top gold line */}
+      {isPremium && (
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent" />
+      )}
+
       <Link
         href={`/services/${service._id}`}
         aria-label={`View details of ${service.serviceName}`}
@@ -39,24 +50,32 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             </div>
           )}
 
-          {/* Gradient for badge readability */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/15" />
+          {/* Gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
 
-          {/* Category */}
-          <span className="absolute left-3 top-3 max-w-[65%] truncate rounded-full border border-white/30 bg-card/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm backdrop-blur-md">
+          {/* Category: top left */}
+          <span className="absolute left-3 top-3 max-w-[55%] truncate rounded-full border border-white/30 bg-card/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-sm backdrop-blur-md">
             {service.category}
           </span>
 
-          {/* Image count */}
+          {/* Premium badge: top right */}
+          {isPremium && (
+            <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-gradient-to-r from-accent via-[#E6C77E] to-accent px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-accent-foreground shadow-lg shadow-black/25">
+              <Crown className="size-3.5" />
+              Premium
+            </span>
+          )}
+
+          {/* Image count: bottom right */}
           {imageCount > 1 && (
-            <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md">
+            <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-md">
               <Images className="size-3.5" />
               {imageCount}
             </span>
           )}
 
-          {/* Floating price */}
-          <div className="absolute bottom-3 left-3 rounded-2xl bg-primary px-4 py-2 text-primary-foreground shadow-lg shadow-black/20">
+          {/* Floating price: bottom left */}
+          <div className="absolute bottom-3 left-3 rounded-2xl bg-primary px-4 py-2 text-primary-foreground shadow-lg shadow-black/25">
             <p className="text-[10px] font-medium uppercase leading-none tracking-wider text-primary-foreground/70">
               Starting from
             </p>
@@ -72,27 +91,43 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             {service.serviceName}
           </h3>
 
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <span className="mt-2 h-[2px] w-10 rounded-full bg-gradient-to-r from-accent to-transparent transition-all duration-500 group-hover:w-20" />
+
+          <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin className="size-3.5 shrink-0 text-accent" />
             <span className="truncate">{service.location}</span>
           </p>
 
-          <p className="mt-3 line-clamp-2 min-h-12 text-sm leading-6 text-muted-foreground">
+          <p className="mt-2.5 line-clamp-2 min-h-12 text-sm leading-6 text-muted-foreground">
             {service.description}
           </p>
 
           {/* ---------- Footer: vendor + arrow ---------- */}
           <div className="mt-auto flex items-center justify-between gap-3 border-t border-dashed border-border pt-4">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-base font-semibold text-primary ring-2 ring-accent/40">
-                {vendorInitial}
+              {/* Avatar with crown badge for premium */}
+              <span className="relative shrink-0">
+                <span
+                  className={`flex size-10 items-center justify-center rounded-full bg-primary/10 font-heading text-lg font-semibold text-primary ring-2 ${
+                    isPremium ? "ring-accent" : "ring-accent/40"
+                  }`}
+                >
+                  {vendorInitial}
+                </span>
+
+                {isPremium && (
+                  <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-accent text-accent-foreground shadow-sm">
+                    <Crown className="size-2.5" />
+                  </span>
+                )}
               </span>
 
               <div className="min-w-0">
                 <p className="text-[10px] font-medium uppercase leading-none tracking-wider text-muted-foreground">
                   Listed by
                 </p>
-                <p className="mt-1 truncate text-xs font-medium text-foreground">
+
+                <p className="mt-1 truncate text-sm font-semibold text-foreground">
                   {vendorName ?? "WedPlan Vendor"}
                 </p>
               </div>
@@ -105,7 +140,7 @@ export default function ServiceCard({ service }: ServiceCardProps) {
         </div>
       </Link>
 
-      {/* Bottom gold line animation */}
+      {/* Bottom line animation */}
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-gradient-to-r from-accent to-primary transition-transform duration-500 group-hover:scale-x-100" />
     </article>
   );

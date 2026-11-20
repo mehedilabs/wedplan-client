@@ -8,6 +8,7 @@ import {
   ArrowRight,
   CalendarHeart,
   CheckCircle2,
+  Crown,
   Images,
   Info,
   Mail,
@@ -93,6 +94,7 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
   const images = service.images ?? [];
   const activeImage = images[activeIndex];
   const vendorInitial = service.vendorName?.charAt(0).toUpperCase() ?? "V";
+  const isPremium = Boolean(service.isPremium);
 
   const today = new Date();
   const minEventDate = [
@@ -201,9 +203,16 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
 
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/15" />
 
-                <span className="absolute left-3 top-3 max-w-[70%] truncate rounded-full border border-white/30 bg-card/90 px-3 py-1 text-[11px] font-semibold text-primary shadow-md backdrop-blur-md">
+                <span className="absolute left-3 top-3 max-w-[55%] truncate rounded-full border border-white/30 bg-card/90 px-3 py-1 text-[11px] font-semibold text-primary shadow-md backdrop-blur-md">
                   {service.category}
                 </span>
+
+                {isPremium && (
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-gradient-to-r from-accent via-[#E6C77E] to-accent px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-accent-foreground shadow-lg shadow-black/25">
+                    <Crown className="size-3.5" />
+                    Premium Vendor
+                  </span>
+                )}
 
                 {images.length > 1 && (
                   <span className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md">
@@ -287,15 +296,42 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                   Service <span className="italic text-primary">Provider</span>
                 </h2>
 
-                <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-secondary/60 p-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary font-heading text-lg font-semibold text-primary-foreground ring-2 ring-accent/40">
-                    {vendorInitial}
+                <div
+                  className={`mt-3 flex items-center gap-3 rounded-xl border p-3 ${
+                    isPremium
+                      ? "border-accent/60 bg-accent/10"
+                      : "border-border bg-secondary/60"
+                  }`}
+                >
+                  <span className="relative shrink-0">
+                    <span
+                      className={`flex size-10 items-center justify-center rounded-full bg-primary font-heading text-lg font-semibold text-primary-foreground ring-2 ${
+                        isPremium ? "ring-accent" : "ring-accent/40"
+                      }`}
+                    >
+                      {vendorInitial}
+                    </span>
+
+                    {isPremium && (
+                      <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-accent text-accent-foreground shadow-sm">
+                        <Crown className="size-2.5" />
+                      </span>
+                    )}
                   </span>
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {service.vendorName}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-foreground">
+                        {service.vendorName}
+                      </p>
+
+                      {isPremium && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-accent via-[#E6C77E] to-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
+                          <Crown className="size-3" />
+                          Premium
+                        </span>
+                      )}
+                    </div>
 
                     <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Mail className="size-3 shrink-0 text-accent" />

@@ -13,5 +13,6 @@ export interface Service {
   images: string[];
   status: ServiceStatus;
   isActive: boolean;
+  isPremium?: boolean;
   createdAt: string;
 }
