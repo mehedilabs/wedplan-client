@@ -29,7 +29,7 @@ export const auth = betterAuth({
   },
 
   user: {
-   additionalFields: {
+additionalFields: {
   role: {
     type: ["customer", "vendor", "admin"],
     required: true,
@@ -40,6 +40,17 @@ export const auth = betterAuth({
     type: "string",
     required: false,
     input: true,
+  },
+  subscriptionPlan: {
+    type: ["free", "premium"],
+    required: true,
+    defaultValue: "free",
+    input: false,
+  },
+  subscriptionExpiresAt: {
+    type: "date",
+    required: false,
+    input: false,
   },
 },
   },

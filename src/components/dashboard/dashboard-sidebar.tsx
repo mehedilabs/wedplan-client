@@ -72,7 +72,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Subscription",
         href: "/dashboard/vendor/subscription",
         icon: Crown,
-        isPlaceholder: true,
       },
       {
         title: "Profile Settings",

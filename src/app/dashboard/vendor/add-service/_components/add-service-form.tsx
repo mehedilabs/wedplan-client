@@ -10,12 +10,17 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
-import { createService, uploadServiceImage } from "@/lib/api/service-api";
+import {
+  createService,
+  getVendorServices,
+  uploadServiceImage,
+} from "@/lib/api/service-api";
 
 const categories = [
   "Photography & Videography",
@@ -93,6 +98,10 @@ export default function AddServiceForm() {
   const [imageError, setImageError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [serviceCount, setServiceCount] = useState(0);
+  const [isLoadingServices, setIsLoadingServices] = useState(true);
+  const [serviceFetchError, setServiceFetchError] = useState("");
+
   const { data: session, isPending: isSessionPending } =
     authClient.useSession();
 
@@ -109,6 +118,50 @@ export default function AddServiceForm() {
       imagesRef.current.forEach((item) => URL.revokeObjectURL(item.url));
     };
   }, []);
+
+  // Fetch vendor services to check the Free plan limit
+  useEffect(() => {
+    const vendorId = session?.user?.id;
+
+    if (isSessionPending) {
+      return;
+    }
+
+    if (!vendorId || session.user.role !== "vendor") {
+      return;
+    }
+
+    let ignore = false;
+
+    const fetchServices = async () => {
+      try {
+        const services = await getVendorServices(vendorId);
+
+        if (!ignore) {
+          setServiceCount(services.length);
+          setServiceFetchError("");
+        }
+      } catch (error) {
+        console.error("Failed to fetch vendor services:", error);
+
+        if (!ignore) {
+          setServiceFetchError(
+            "Failed to load your services. Please try again.",
+          );
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoadingServices(false);
+        }
+      }
+    };
+
+    fetchServices();
+
+    return () => {
+      ignore = true;
+    };
+  }, [session?.user?.id, session?.user?.role, isSessionPending]);
 
   const openFilePicker = () => fileInputRef.current?.click();
 
@@ -204,6 +257,17 @@ export default function AddServiceForm() {
       return;
     }
 
+    // Check Free plan service limit
+    if (session.user.subscriptionPlan !== "premium" && serviceCount >= 3) {
+      toast.add({
+        title: "Service limit reached",
+        description:
+          "Your Free plan allows up to 3 services. Delete an existing service or upgrade to Premium.",
+        type: "warning",
+      });
+      return;
+    }
+
     const form = event.currentTarget;
     const formData = new FormData(form);
     const price = Number(formData.get("price"));
@@ -246,6 +310,10 @@ export default function AddServiceForm() {
         location: String(formData.get("location")).trim(),
         images: imageUrls,
       });
+
+      // Update service count after successful submission
+      setServiceCount((prev) => prev + 1);
+
       toast.add({
         title: "Service submitted!",
         description:
@@ -270,8 +338,139 @@ export default function AddServiceForm() {
     }
   };
 
+  // Loading state
+  if (
+    isSessionPending ||
+    (session?.user?.role === "vendor" && isLoadingServices)
+  ) {
+    return (
+      <div className="flex min-h-60 items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  // Service fetch error
+  if (serviceFetchError) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-6 text-center">
+        <p className="font-medium text-foreground">
+          Unable to load your services
+        </p>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          {serviceFetchError}
+        </p>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Please refresh the page to try again.
+        </p>
+      </div>
+    );
+  }
+
+  // Free plan limit reached
+  if (
+    session?.user?.role === "vendor" &&
+    session.user.subscriptionPlan !== "premium" &&
+    serviceCount >= 3
+  ) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6 text-center sm:p-8">
+        <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <span className="text-2xl">♛</span>
+        </div>
+
+        <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+          Free Plan Limit Reached
+        </p>
+
+        <h2 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
+          You&apos;ve reached your service limit
+        </h2>
+
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-muted-foreground">
+          Your Free plan allows up to 3 services. Delete an existing service to
+          add another one, or upgrade to Premium for unlimited services.
+        </p>
+
+        {/* Service usage */}
+        <div className="mt-7 rounded-xl border border-border bg-muted/40 p-5 text-left">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-foreground">
+              Your service usage
+            </span>
+
+            <span className="font-semibold text-primary">
+              {serviceCount} / 3
+            </span>
+          </div>
+
+          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-full rounded-full bg-primary" />
+          </div>
+
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            Pending, approved and rejected services all count toward your Free
+            plan limit.
+          </p>
+        </div>
+
+        {/* Premium upgrade */}
+        <div className="mt-6 rounded-xl border border-primary/20 bg-primary/5 p-5 text-left">
+          <h3 className="font-heading text-xl font-semibold text-foreground">
+            Upgrade to Premium
+          </h3>
+
+          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <li>✓ Create unlimited services</li>
+            <li>✓ Get a Premium Vendor Badge</li>
+            <li>✓ Enjoy all Free plan features</li>
+          </ul>
+
+          <Link
+            href="/dashboard/vendor/subscription"
+            className="mt-6 flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition hover:opacity-90"
+          >
+            Explore Premium
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      {/* Free plan usage indicator */}
+      {session?.user?.role === "vendor" &&
+        session.user.subscriptionPlan !== "premium" && (
+          <div className="rounded-xl border border-border bg-muted/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-foreground">
+                Free plan service usage
+              </span>
+
+              <span className="text-sm font-semibold text-primary">
+                {serviceCount} / 3
+              </span>
+            </div>
+
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-300"
+                style={{
+                  width: `${(serviceCount / 3) * 100}%`,
+                }}
+              />
+            </div>
+
+            <p className="mt-2 text-xs text-muted-foreground">
+              {3 - serviceCount} service
+              {3 - serviceCount !== 1 ? "s" : ""} remaining on your Free plan.
+            </p>
+          </div>
+        )}
+
       {/* Service Details */}
       <section className="space-y-3.5">
         <SectionHeader
@@ -283,6 +482,7 @@ export default function AddServiceForm() {
         <div className="grid gap-3.5 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="serviceName">Service Name</Label>
+
             <input
               id="serviceName"
               name="serviceName"
