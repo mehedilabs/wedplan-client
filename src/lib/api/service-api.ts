@@ -141,6 +141,29 @@ export async function uploadServiceImage(file: File): Promise<string> {
   return result.data.url;
 }
 
+// Upload a profile image to ImgBB
+export async function uploadProfileImage(file: File): Promise<string> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_URL}/services/upload-image`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const result: ApiResponse<ImageUploadData> = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Profile image upload failed");
+  }
+
+  return result.data.url;
+}
+
 // Create a new service
 export async function createService(
   serviceData: CreateServiceData,

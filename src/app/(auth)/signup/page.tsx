@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import { uploadProfileImage } from "@/lib/api/service-api";
 
 type AccountRole = "customer" | "vendor";
 
@@ -103,10 +104,18 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
+      // Upload profile photo first, if selected
+      let imageUrl: string | undefined;
+
+      if (profilePhoto) {
+        imageUrl = await uploadProfileImage(profilePhoto);
+      }
+
       const { error } = await authClient.signUp.email({
         name,
         email,
         password,
+        image: imageUrl,
         role,
         ...(role === "vendor" && { businessName }),
         callbackURL: "/",
@@ -210,6 +219,7 @@ export default function SignupPage() {
                   <span className="whitespace-nowrap text-[13px] font-semibold leading-tight text-foreground sm:text-sm">
                     {title}
                   </span>
+
                   <span className="mt-0.5 whitespace-nowrap text-[10.5px] leading-tight tracking-tight text-muted-foreground sm:text-xs sm:tracking-normal">
                     {description}
                   </span>
