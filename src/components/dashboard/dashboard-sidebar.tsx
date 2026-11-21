@@ -108,7 +108,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Manage Users",
         href: "/dashboard/admin/users",
         icon: Users,
-        isPlaceholder: true,
       },
       {
         title: "Manage Services",
