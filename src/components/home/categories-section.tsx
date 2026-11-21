@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { getServices } from "@/lib/api/service-api";
-import type { Service } from "@/types/service";
 import { CategoryCardImage } from "./category-card-image";
 
 interface CategoryDefinition {
@@ -22,8 +20,7 @@ const CATEGORIES: CategoryDefinition[] = [
   {
     name: "Wedding Venues",
     badge: "Curated Spaces",
-    description:
-      "Historic estates, garden conservatories & luxury ballrooms",
+    description: "Historic estates, garden conservatories & luxury ballrooms",
     fallbackImage: "/images/categories/venues.jpg",
   },
   {
@@ -36,8 +33,7 @@ const CATEGORIES: CategoryDefinition[] = [
   {
     name: "Catering Services",
     badge: "Culinary Excellence",
-    description:
-      "Chef-crafted tasting menus, patisserie & craft beverage bars",
+    description: "Chef-crafted tasting menus, patisserie & craft beverage bars",
     fallbackImage: "/images/categories/catering.jpg",
   },
   {
@@ -50,51 +46,12 @@ const CATEGORIES: CategoryDefinition[] = [
   {
     name: "Wedding Fashion",
     badge: "Atelier Couture",
-    description:
-      "Couture bridal gowns, bespoke tuxedos & heirloom accessories",
+    description: "Couture bridal gowns, bespoke tuxedos & heirloom accessories",
     fallbackImage: "/images/categories/fashion.jpg",
   },
 ];
 
-export default async function CategoriesSection() {
-  let services: Service[] = [];
-
-  try {
-    services = await getServices();
-  } catch (error) {
-    console.error("Failed to load services for category images:", error);
-  }
-
-  // Filter only approved and active services from the backend API
-  const approvedActiveServices = services.filter(
-    (service) => service.status === "approved" && service.isActive === true,
-  );
-
-  // Map each category to the newest service's image, or its permanent static fallback
-  const categoriesWithDisplayImage = CATEGORIES.map((category) => {
-    // Find all approved & active services belonging to this category
-    const matchingServices = approvedActiveServices
-      .filter((service) => service.category === category.name)
-      .sort((a, b) => {
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return timeB - timeA;
-      });
-
-    // Pick newest service
-    const newestService = matchingServices[0];
-
-    // Find the first valid image URL in the newest service
-    const dynamicImage = newestService?.images?.find(
-      (img) => typeof img === "string" && img.trim().length > 0,
-    );
-
-    return {
-      ...category,
-      displayImage: dynamicImage || category.fallbackImage,
-    };
-  });
-
+export default function CategoriesSection() {
   return (
     <section className="relative isolate overflow-hidden bg-background px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
       {/* Decorative ambient background glows */}
@@ -120,15 +77,15 @@ export default async function CategoriesSection() {
 
         {/* 6 Category Cards Grid */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-7">
-          {categoriesWithDisplayImage.map((category) => (
+          {CATEGORIES.map((category) => (
             <Link
               key={category.name}
               href={`/services?category=${encodeURIComponent(category.name)}`}
               className="group relative flex aspect-[16/11] w-full flex-col justify-end overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 sm:aspect-[16/10]"
             >
-              {/* Category Image with automatic fallback */}
+              {/* Static Category Image */}
               <CategoryCardImage
-                src={category.displayImage}
+                src={category.fallbackImage}
                 fallbackSrc={category.fallbackImage}
                 alt={category.name}
               />
