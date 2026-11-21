@@ -205,7 +205,7 @@ export default function BookingRequestCard({
                 Package Price
               </span>
               <span className="mt-0.5 font-heading text-2xl font-semibold leading-none text-primary">
-                ৳{booking.price.toLocaleString("en-BD")}
+                ${booking.price.toLocaleString("en-BD")}
               </span>
             </div>
           )}

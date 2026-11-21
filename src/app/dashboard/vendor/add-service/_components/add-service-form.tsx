@@ -531,7 +531,7 @@ export default function AddServiceForm() {
 
             <div className="relative">
               <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">
-                ৳
+                $
               </span>
 
               <input

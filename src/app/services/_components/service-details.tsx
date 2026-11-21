@@ -269,7 +269,7 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                     Starting Package
                   </span>
                   <span className="mt-0.5 font-heading text-2xl font-semibold leading-none text-primary">
-                    ৳{service.price.toLocaleString("en-BD")}
+                    ${service.price.toLocaleString("en-BD")}
                   </span>
                 </div>
               </div>

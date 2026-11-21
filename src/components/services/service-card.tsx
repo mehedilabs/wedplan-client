@@ -80,7 +80,7 @@ export default function ServiceCard({ service }: ServiceCardProps) {
               Starting from
             </p>
             <p className="mt-1 text-lg font-bold leading-none">
-              ৳{service.price.toLocaleString("en-BD")}
+              ${service.price.toLocaleString("en-BD")}
             </p>
           </div>
         </div>

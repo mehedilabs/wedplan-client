@@ -163,7 +163,7 @@ export default function BookingCard({
                 <div className="flex items-baseline gap-1.5">
                   <Wallet className="size-4 text-primary" />
                   <span className="font-heading text-lg font-bold text-primary">
-                    ৳{booking.price.toLocaleString("en-BD")}
+                    ${booking.price.toLocaleString("en-BD")}
                   </span>
                 </div>
               )}

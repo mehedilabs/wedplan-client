@@ -24,6 +24,7 @@ export function DashboardHeader({
   const pathname = usePathname();
 
   const getPageTitle = () => {
+    if (pathname.includes("/admin/services")) return "Manage Services";
     if (pathname.includes("/add-service")) return "Add New Service";
     if (pathname.includes("/services")) return "My Services";
     if (pathname.includes("/bookings")) return "My Bookings";
