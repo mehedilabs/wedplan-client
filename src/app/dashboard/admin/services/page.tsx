@@ -1,17 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Layers,
-  RefreshCw,
-  AlertCircle,
-} from "lucide-react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Layers, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAdminServices } from "@/lib/api/admin-service-api";
 import type { Service } from "@/types/service";
 
 import ServiceFilters, {
   type ServiceCounts,
+  WEDDING_CATEGORIES,
 } from "./_components/service-filters";
 import ServiceTable from "./_components/service-table";
 import ServiceDetailsDialog from "./_components/service-details-dialog";
@@ -19,17 +17,67 @@ import ServiceStatusDialog from "./_components/service-status-dialog";
 import ServiceActiveDialog from "./_components/service-active-dialog";
 import DeleteServiceDialog from "./_components/delete-service-dialog";
 
-export default function AdminServicesPage() {
+function AdminServicesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters state
+  // Read URL query parameters on initial render
+  const statusParam = searchParams.get("status");
+  const categoryParam = searchParams.get("category");
+  const availParam = searchParams.get("availability");
+
+  // Adjust local overrides when URL search parameters change
+  const [statusOverride, setStatusOverride] = useState<string | null>(null);
+  const [prevStatusParam, setPrevStatusParam] = useState(statusParam);
+
+  if (statusParam !== prevStatusParam) {
+    setPrevStatusParam(statusParam);
+    setStatusOverride(null);
+  }
+
+  const [categoryOverride, setCategoryOverride] = useState<string | null>(null);
+  const [prevCategoryParam, setPrevCategoryParam] = useState(categoryParam);
+
+  if (categoryParam !== prevCategoryParam) {
+    setPrevCategoryParam(categoryParam);
+    setCategoryOverride(null);
+  }
+
+  const [availOverride, setAvailOverride] = useState<string | null>(null);
+  const [prevAvailParam, setPrevAvailParam] = useState(availParam);
+
+  if (availParam !== prevAvailParam) {
+    setPrevAvailParam(availParam);
+    setAvailOverride(null);
+  }
+
+  // Active filter states derived directly from URL parameters or user override
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedAvailability, setSelectedAvailability] = useState("all");
+  const selectedStatus =
+    statusOverride ??
+    (statusParam === "pending" ||
+    statusParam === "approved" ||
+    statusParam === "rejected"
+      ? statusParam
+      : "all");
+
+  const selectedCategory =
+    categoryOverride ??
+    (categoryParam &&
+    WEDDING_CATEGORIES.includes(
+      categoryParam as (typeof WEDDING_CATEGORIES)[number],
+    )
+      ? categoryParam
+      : "all");
+
+  const selectedAvailability =
+    availOverride ??
+    (availParam === "active" || availParam === "inactive" ? availParam : "all");
 
   // Modal dialog states
   const [detailsService, setDetailsService] = useState<Service | null>(null);
@@ -170,16 +218,71 @@ export default function AdminServicesPage() {
 
   const hasActiveFilters = Boolean(
     searchQuery.trim() ||
-      selectedStatus !== "all" ||
-      selectedCategory !== "all" ||
-      selectedAvailability !== "all",
+    selectedStatus !== "all" ||
+    selectedCategory !== "all" ||
+    selectedAvailability !== "all",
   );
+
+  // Sync status changes to URL search params
+  const handleStatusChange = (status: string) => {
+    setStatusOverride(status);
+    const params = new URLSearchParams(searchParams.toString());
+    if (status && status !== "all") {
+      params.set("status", status);
+    } else {
+      params.delete("status");
+    }
+    const query = params.toString();
+    router.replace(
+      query
+        ? `/dashboard/admin/services?${query}`
+        : "/dashboard/admin/services",
+      { scroll: false },
+    );
+  };
+
+  // Sync category changes to URL search params
+  const handleCategoryChange = (category: string) => {
+    setCategoryOverride(category);
+    const params = new URLSearchParams(searchParams.toString());
+    if (category && category !== "all") {
+      params.set("category", category);
+    } else {
+      params.delete("category");
+    }
+    const query = params.toString();
+    router.replace(
+      query
+        ? `/dashboard/admin/services?${query}`
+        : "/dashboard/admin/services",
+      { scroll: false },
+    );
+  };
+
+  // Sync availability changes to URL search params
+  const handleAvailabilityChange = (availability: string) => {
+    setAvailOverride(availability);
+    const params = new URLSearchParams(searchParams.toString());
+    if (availability && availability !== "all") {
+      params.set("availability", availability);
+    } else {
+      params.delete("availability");
+    }
+    const query = params.toString();
+    router.replace(
+      query
+        ? `/dashboard/admin/services?${query}`
+        : "/dashboard/admin/services",
+      { scroll: false },
+    );
+  };
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedStatus("all");
-    setSelectedCategory("all");
-    setSelectedAvailability("all");
+    setStatusOverride("all");
+    setCategoryOverride("all");
+    setAvailOverride("all");
+    router.replace("/dashboard/admin/services", { scroll: false });
   };
 
   return (
@@ -207,7 +310,9 @@ export default function AdminServicesPage() {
               </h1>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
-                Review submitted wedding services, filter by category and status, approve or reject listings, and manage marketplace availability.
+                Review submitted wedding services, filter by category and
+                status, approve or reject listings, and manage marketplace
+                availability.
               </p>
             </div>
           </div>
@@ -245,7 +350,7 @@ export default function AdminServicesPage() {
             type="button"
             variant="outline"
             onClick={() => loadServices()}
-            className="rounded-full border-rose-300 bg-card px-6 text-xs font-semibold text-rose-800 shadow-sm hover:bg-rose-100 cursor-pointer"
+            className="cursor-pointer rounded-full border-rose-300 bg-card px-6 text-xs font-semibold text-rose-800 shadow-sm hover:bg-rose-100"
           >
             Retry Loading
           </Button>
@@ -255,7 +360,7 @@ export default function AdminServicesPage() {
       {/* ---------- Loading Skeleton ---------- */}
       {isLoading && (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6 animate-pulse">
+          <div className="grid animate-pulse grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -264,23 +369,23 @@ export default function AdminServicesPage() {
             ))}
           </div>
 
-          <div className="h-14 rounded-2xl border border-border/60 bg-muted/30 animate-pulse" />
+          <div className="h-14 animate-pulse rounded-2xl border border-border/60 bg-muted/30" />
 
-          <div className="rounded-2xl border border-border/60 bg-card p-6 space-y-4 animate-pulse">
+          <div className="space-y-4 rounded-2xl border border-border/60 bg-card p-6 animate-pulse">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <div className="h-4 w-32 bg-muted/60 rounded" />
-              <div className="h-4 w-20 bg-muted/60 rounded" />
+              <div className="h-4 w-32 rounded bg-muted/60" />
+              <div className="h-4 w-20 rounded bg-muted/60" />
             </div>
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4 py-2">
-                <div className="size-12 rounded-xl bg-muted/60 shrink-0" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 w-44 bg-muted/60 rounded" />
-                  <div className="h-3 w-64 bg-muted/40 rounded" />
+                <div className="size-12 shrink-0 rounded-xl bg-muted/60" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-44 rounded bg-muted/60" />
+                  <div className="h-3 w-64 rounded bg-muted/40" />
                 </div>
-                <div className="h-6 w-20 bg-muted/40 rounded-full" />
-                <div className="h-6 w-16 bg-muted/40 rounded-full" />
-                <div className="h-8 w-28 bg-muted/30 rounded" />
+                <div className="h-6 w-20 rounded-full bg-muted/40" />
+                <div className="h-6 w-16 rounded-full bg-muted/40" />
+                <div className="h-8 w-28 rounded bg-muted/30" />
               </div>
             ))}
           </div>
@@ -295,11 +400,11 @@ export default function AdminServicesPage() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             selectedStatus={selectedStatus}
-            onStatusChange={setSelectedStatus}
+            onStatusChange={handleStatusChange}
             selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
+            onCategoryChange={handleCategoryChange}
             selectedAvailability={selectedAvailability}
-            onAvailabilityChange={setSelectedAvailability}
+            onAvailabilityChange={handleAvailabilityChange}
             counts={counts}
             hasActiveFilters={hasActiveFilters}
             onReset={handleResetFilters}
@@ -316,14 +421,14 @@ export default function AdminServicesPage() {
           />
 
           {/* Results summary footer */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+          <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
             <span>
               Showing{" "}
-              <strong className="text-foreground font-semibold">
+              <strong className="font-semibold text-foreground">
                 {filteredServices.length}
               </strong>{" "}
               of{" "}
-              <strong className="text-foreground font-semibold">
+              <strong className="font-semibold text-foreground">
                 {services.length}
               </strong>{" "}
               submitted services
@@ -332,7 +437,7 @@ export default function AdminServicesPage() {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-primary hover:underline font-medium cursor-pointer"
+                className="cursor-pointer font-medium text-primary hover:underline"
               >
                 Clear all filters
               </button>
@@ -379,5 +484,30 @@ export default function AdminServicesPage() {
         onSuccess={() => loadServices()}
       />
     </div>
+  );
+}
+
+function AdminServicesLoadingSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-32 rounded-3xl border border-border bg-card" />
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-16 rounded-xl border border-border bg-card"
+          />
+        ))}
+      </div>
+      <div className="h-14 rounded-2xl border border-border bg-card" />
+    </div>
+  );
+}
+
+export default function AdminServicesPage() {
+  return (
+    <Suspense fallback={<AdminServicesLoadingSkeleton />}>
+      <AdminServicesContent />
+    </Suspense>
   );
 }

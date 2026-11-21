@@ -15,7 +15,6 @@ import {
   Copy,
   Check,
   Calendar,
-  DollarSign,
   ShieldAlert,
   ChevronLeft,
   ChevronRight,

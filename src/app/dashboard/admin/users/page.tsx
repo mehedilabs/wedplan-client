@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Shield, RefreshCw, AlertCircle, FilterX } from "lucide-react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Shield, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAdminUsers } from "@/lib/api/admin-user-api";
 import type { AdminUser } from "@/types/admin-user";
@@ -13,16 +14,53 @@ import ChangeRoleDialog from "./_components/change-role-dialog";
 import ChangeStatusDialog from "./_components/change-status-dialog";
 import DeleteUserDialog from "./_components/delete-user-dialog";
 
-export default function AdminUsersPage() {
+function AdminUsersContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters state
+  // Read URL query parameters
+  const roleParam = searchParams.get("role");
+  const statusParam = searchParams.get("status");
+
+  // Adjust local overrides when URL search parameters change
+  const [roleOverride, setRoleOverride] = useState<string | null>(null);
+  const [prevRoleParam, setPrevRoleParam] = useState(roleParam);
+
+  if (roleParam !== prevRoleParam) {
+    setPrevRoleParam(roleParam);
+    setRoleOverride(null);
+  }
+
+  const [statusOverride, setStatusOverride] = useState<string | null>(null);
+  const [prevStatusParam, setPrevStatusParam] = useState(statusParam);
+
+  if (statusParam !== prevStatusParam) {
+    setPrevStatusParam(statusParam);
+    setStatusOverride(null);
+  }
+
+  // Active filter states derived directly from URL parameters or user override
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRole, setSelectedRole] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const selectedRole =
+    roleOverride ??
+    (roleParam === "vendor" ||
+    roleParam === "customer" ||
+    roleParam === "admin"
+      ? roleParam
+      : "all");
+
+  const selectedStatus =
+    statusOverride ??
+    (statusParam === "active" ||
+    statusParam === "inactive" ||
+    statusParam === "blocked"
+      ? statusParam
+      : "all");
 
   // Modal dialog states
   const [detailsUser, setDetailsUser] = useState<AdminUser | null>(null);
@@ -143,10 +181,43 @@ export default function AdminUsersPage() {
     searchQuery.trim() || selectedRole !== "all" || selectedStatus !== "all",
   );
 
+  // Sync role changes to state and URL search params
+  const handleRoleChange = (role: string) => {
+    setRoleOverride(role);
+    const params = new URLSearchParams(searchParams.toString());
+    if (role && role !== "all") {
+      params.set("role", role);
+    } else {
+      params.delete("role");
+    }
+    const query = params.toString();
+    router.replace(
+      query ? `/dashboard/admin/users?${query}` : "/dashboard/admin/users",
+      { scroll: false },
+    );
+  };
+
+  // Sync status changes to state and URL search params
+  const handleStatusChange = (status: string) => {
+    setStatusOverride(status);
+    const params = new URLSearchParams(searchParams.toString());
+    if (status && status !== "all") {
+      params.set("status", status);
+    } else {
+      params.delete("status");
+    }
+    const query = params.toString();
+    router.replace(
+      query ? `/dashboard/admin/users?${query}` : "/dashboard/admin/users",
+      { scroll: false },
+    );
+  };
+
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedRole("all");
-    setSelectedStatus("all");
+    setRoleOverride("all");
+    setStatusOverride("all");
+    router.replace("/dashboard/admin/users", { scroll: false });
   };
 
   return (
@@ -284,9 +355,9 @@ export default function AdminUsersPage() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             selectedRole={selectedRole}
-            onRoleChange={setSelectedRole}
+            onRoleChange={handleRoleChange}
             selectedStatus={selectedStatus}
-            onStatusChange={setSelectedStatus}
+            onStatusChange={handleStatusChange}
             counts={counts}
             hasActiveFilters={hasActiveFilters}
             onReset={handleResetFilters}
@@ -320,9 +391,8 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                className="cursor-pointer font-medium text-primary hover:underline"
               >
-                <FilterX className="size-3.5" />
                 Clear all filters
               </button>
             )}
@@ -367,5 +437,30 @@ export default function AdminUsersPage() {
         onSuccess={() => loadUsers()}
       />
     </div>
+  );
+}
+
+function AdminUsersLoadingSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-32 rounded-3xl border border-border bg-card" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-20 rounded-2xl border border-border bg-card"
+          />
+        ))}
+      </div>
+      <div className="h-14 rounded-2xl border border-border bg-card" />
+    </div>
+  );
+}
+
+export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={<AdminUsersLoadingSkeleton />}>
+      <AdminUsersContent />
+    </Suspense>
   );
 }

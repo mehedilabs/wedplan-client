@@ -1,4 +1,4 @@
-import type { Service, ServiceStatus } from "@/types/service";
+import type { Service } from "@/types/service";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 

@@ -1,0 +1,8 @@
+export interface AdminOverviewStats {
+  totalUsers: number;
+  totalVendors: number;
+  totalCustomers: number;
+  totalServices: number;
+  pendingServices: number;
+  totalTransactions: number;
+}

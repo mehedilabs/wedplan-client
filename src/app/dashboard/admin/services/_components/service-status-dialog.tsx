@@ -7,7 +7,6 @@ import {
   XCircle,
   LoaderCircle,
   ShieldCheck,
-  AlertTriangle,
 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";

@@ -220,7 +220,7 @@ export function DashboardSidebar({
             {/* Subtitle with Gold Underline */}
             <div className="mt-1.5 flex flex-col items-center">
               <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Admin Portal
+                {currentMenu.label}
               </span>
               {/* Gold Accent Underline */}
               <span className="mt-1 h-[2px] w-12 bg-gradient-to-r from-transparent via-accent to-transparent opacity-80" />

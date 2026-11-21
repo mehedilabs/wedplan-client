@@ -178,11 +178,7 @@ export default function ServiceFilters({
             selectedCategory === "all" &&
             selectedAvailability === "all"
           }
-          onClick={() => {
-            onStatusChange("all");
-            onCategoryChange("all");
-            onAvailabilityChange("all");
-          }}
+          onClick={onReset}
         />
 
         {/* Pending Services */}
