@@ -6,24 +6,38 @@ import FeaturedServicesSkeleton from "@/components/home/featured-services-skelet
 import HeroSection from "@/components/home/hero-section";
 import WhyChooseWedPlan from "@/components/home/why-choose-wedplan";
 import HowWedPlanWorks from "@/components/home/how-wedplan-works";
+import HomeSectionMotion from "@/components/home/home-section-motion";
 
 export default function Home() {
   return (
-    <main>
-      <HeroSection />
+    <main className="overflow-x-clip">
+      <HomeSectionMotion direction="none">
+        <HeroSection />
+      </HomeSectionMotion>
 
-      <Suspense
-        fallback={<div className="min-h-[700px] animate-pulse bg-background" />}
-      >
-        <CategoriesSection />
-      </Suspense>
+      <HomeSectionMotion direction="left">
+        <Suspense
+          fallback={
+            <div className="min-h-[700px] animate-pulse bg-background" />
+          }
+        >
+          <CategoriesSection />
+        </Suspense>
+      </HomeSectionMotion>
 
-      <Suspense fallback={<FeaturedServicesSkeleton />}>
-        <FeaturedServicesSection />
-      </Suspense>
+      <HomeSectionMotion direction="right">
+        <Suspense fallback={<FeaturedServicesSkeleton />}>
+          <FeaturedServicesSection />
+        </Suspense>
+      </HomeSectionMotion>
 
-      <WhyChooseWedPlan />
-      <HowWedPlanWorks />
+      <HomeSectionMotion direction="up">
+        <WhyChooseWedPlan />
+      </HomeSectionMotion>
+
+      <HomeSectionMotion direction="up">
+        <HowWedPlanWorks />
+      </HomeSectionMotion>
     </main>
   );
 }

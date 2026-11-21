@@ -331,6 +331,23 @@ export default function Navbar() {
     mobileMenuRef.current?.removeAttribute("open");
   };
 
+  // Logo-তে ক্লিক: home page-এ থাকলে মসৃণভাবে উপরে যাবে, অন্য page-এ থাকলে home-এ যাবে
+  const handleLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      event.preventDefault();
+      closeAllDropdowns();
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    }
+  };
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -409,12 +426,17 @@ export default function Navbar() {
       <nav
         className={cn(
           "relative mx-auto flex w-full max-w-7xl items-center justify-between",
-          "h-[72px] px-4 sm:px-6 md:grid md:h-20 md:grid-cols-[1fr_auto_1fr] lg:px-8",
+          "h-[72px] px-4 sm:px-6 md:grid md:h-20 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:px-8",
           "transition-all duration-500",
         )}
       >
         {/* Logo */}
-        <Link href="/" aria-label="WedPlan home" className="justify-self-start">
+        <Link
+          href="/"
+          aria-label="WedPlan home"
+          onClick={handleLogoClick}
+          className="shrink-0 justify-self-start"
+        >
           <Logo />
         </Link>
 
@@ -430,6 +452,8 @@ export default function Navbar() {
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "relative rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300",
+                    link.href === roleNavLink?.href &&
+                      "animate-in fade-in-0 slide-in-from-right-2 duration-500",
                     active
                       ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
