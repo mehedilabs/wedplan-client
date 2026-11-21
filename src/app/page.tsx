@@ -5,6 +5,7 @@ import FeaturedServicesSection from "@/components/home/featured-services-section
 import FeaturedServicesSkeleton from "@/components/home/featured-services-skeleton";
 import HeroSection from "@/components/home/hero-section";
 import WhyChooseWedPlan from "@/components/home/why-choose-wedplan";
+import HowWedPlanWorks from "@/components/home/how-wedplan-works";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       </Suspense>
 
       <WhyChooseWedPlan />
+      <HowWedPlanWorks />
     </main>
   );
 }

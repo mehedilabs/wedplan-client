@@ -1,8 +1,10 @@
+import Link from "next/link";
 import {
-  HeartHandshake,
-  ClipboardCheck,
+  ArrowRight,
   BadgeCheck,
+  ClipboardCheck,
   Headset,
+  HeartHandshake,
 } from "lucide-react";
 
 const benefits = [
@@ -33,69 +35,125 @@ const benefits = [
 ];
 
 export default function WhyChooseWedPlan() {
-  return (
-    <section className="relative isolate overflow-hidden bg-background px-4 pb-16 pt-4 sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
-      {/* Soft ambient background glows */}
-      <div className="pointer-events-none absolute -left-40 top-20 -z-10 size-96 rounded-full bg-accent/[0.06] blur-[100px]" />
-      <div className="pointer-events-none absolute -right-40 bottom-20 -z-10 size-96 rounded-full bg-primary/[0.05] blur-[100px]" />
+  const [featured, ...others] = benefits;
+  const FeaturedIcon = featured.icon;
 
-      <div className="mx-auto max-w-7xl">
-        {/* ═══════ HEADER ═══════ */}
-        <div className="mx-auto mb-8 max-w-2xl text-center sm:mb-16">
-          <div className="mb-2 flex items-center justify-center gap-2 sm:mb-4">
-            <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary sm:text-xs">
+  return (
+    <section className="relative isolate overflow-hidden bg-background px-4 py-14 sm:px-8 sm:py-24 lg:px-12 lg:py-28">
+      {/* Soft glows */}
+      <div className="pointer-events-none absolute -left-40 top-20 -z-10 size-96 rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-40 bottom-20 -z-10 size-[28rem] rounded-full bg-primary/5 blur-3xl" />
+
+      <div className="mx-auto max-w-6xl">
+        {/* ================= Header ================= */}
+        <div className="mb-9 text-center sm:mb-12 lg:mb-14 lg:flex lg:items-end lg:justify-between lg:gap-12 lg:text-left">
+          <div className="lg:max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-primary sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.18em]">
               Why WedPlan?
-            </p>
+            </div>
+
+            <h2 className="mt-5 font-heading text-[2rem] font-semibold leading-[1.12] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              Your Dream Wedding,{" "}
+              <span className="relative inline-block italic text-primary">
+                Made Easier
+              </span>
+            </h2>
           </div>
 
-          <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-5xl sm:leading-tight">
-            Your Dream Wedding,{" "}
-            <span className="relative inline-block italic text-primary">
-              Made Easier
-              <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded-full bg-gradient-to-r from-accent to-transparent" />
-            </span>
-          </h2>
-
-          <p className="mt-4 text-sm leading-6 text-muted-foreground sm:mt-6 sm:text-base sm:leading-8">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-muted-foreground sm:mt-5 sm:max-w-xl sm:text-base sm:leading-8 lg:mx-0 lg:mt-0 lg:max-w-sm">
             Planning your special day should be exciting, not overwhelming.
             WedPlan brings everything you need together to make your wedding
             journey simple, joyful, and memorable.
           </p>
         </div>
 
-        {/* ═══════ GRID ═══════ */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-7">
-          {benefits.map((benefit) => {
+        {/* ================= Bento grid ================= */}
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+          {/* ---------- Featured card ---------- */}
+          <article className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-xl shadow-primary/20 sm:col-span-2 sm:p-8 lg:col-span-1 lg:row-span-2 lg:p-9">
+            {/* Decorations */}
+            <div className="pointer-events-none absolute -right-12 -top-12 size-56 rounded-full bg-accent/30 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-10 size-48 rounded-full bg-background/10 blur-3xl" />
+            <FeaturedIcon
+              aria-hidden="true"
+              strokeWidth={1}
+              className="pointer-events-none absolute -bottom-8 -right-8 size-44 text-primary-foreground/10 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6 sm:size-56"
+            />
+
+            <div className="relative">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground shadow-lg shadow-black/20 sm:size-16">
+                <FeaturedIcon className="size-7 sm:size-8" strokeWidth={1.8} />
+              </span>
+
+              <h3 className="mt-6 max-w-xs font-heading text-3xl font-semibold leading-tight sm:text-4xl">
+                {featured.title}
+              </h3>
+
+              <p className="mt-3 max-w-sm text-sm leading-7 text-primary-foreground/75 sm:text-base sm:leading-8">
+                {featured.description}
+              </p>
+            </div>
+
+            <Link
+              href="/services"
+              className="group/link relative mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-background/10 px-5 py-2.5 text-sm font-semibold ring-1 ring-primary-foreground/25 backdrop-blur-sm transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:ring-accent lg:mt-12"
+            >
+              Explore Services
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover/link:translate-x-1" />
+            </Link>
+          </article>
+
+          {/* ---------- Other cards ---------- */}
+          {others.map((benefit, index) => {
             const Icon = benefit.icon;
+            const isWide = index === 0;
 
             return (
-              <div
+              <article
                 key={benefit.title}
-                className="group relative flex flex-col justify-start overflow-hidden rounded-2xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:border-accent/40 hover:shadow-xl hover:shadow-primary/5 sm:rounded-[1.5rem] sm:p-7"
+                className={`group relative flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 sm:rounded-3xl sm:p-6 ${
+                  isWide
+                    ? "items-start sm:col-span-2 sm:items-center sm:gap-6 sm:p-8"
+                    : "items-start sm:flex-col sm:gap-0"
+                }`}
               >
-                {/* Subtle hover gradient background */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-secondary/40 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                {/* Hover glow */}
+                <div className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-accent/0 blur-2xl transition-colors duration-500 group-hover:bg-accent/20" />
 
-                <div className="relative">
-                  {/* Icon */}
-                  <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-secondary text-primary shadow-sm ring-1 ring-border/50 transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/20 sm:mb-6 sm:size-14 sm:rounded-2xl">
-                    <Icon className="size-6 sm:size-[26px]" strokeWidth={1.8} />
-                  </div>
+                {/* Icon */}
+                <span
+                  className={`relative flex shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-border/60 transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/25 ${
+                    isWide
+                      ? "size-12 sm:size-16 sm:rounded-2xl"
+                      : "size-12 sm:mb-5 sm:size-14 sm:rounded-2xl"
+                  }`}
+                >
+                  <Icon
+                    className={
+                      isWide ? "size-6 sm:size-7" : "size-6 sm:size-[26px]"
+                    }
+                    strokeWidth={1.8}
+                  />
+                </span>
 
-                  {/* Title */}
-                  <h3 className="mb-2 font-heading text-lg font-bold text-foreground sm:mb-2.5 sm:text-xl">
+                {/* Text */}
+                <div className="relative min-w-0">
+                  <h3
+                    className={`font-heading font-semibold leading-tight text-foreground ${
+                      isWide ? "text-xl sm:text-2xl" : "text-xl sm:text-2xl"
+                    }`}
+                  >
                     {benefit.title}
                   </h3>
 
-                  {/* Description */}
-                  <p className="text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
+                  <p className="mt-1.5 text-[13px] leading-6 text-muted-foreground sm:mt-2 sm:text-sm sm:leading-7">
                     {benefit.description}
                   </p>
                 </div>
 
-                {/* Bottom accent line on hover */}
-                <div className="absolute bottom-0 left-6 right-6 h-[2px] scale-x-0 rounded-full bg-gradient-to-r from-transparent via-accent to-transparent transition-transform duration-500 group-hover:scale-x-100" />
-              </div>
+                {/* Bottom line on hover */}
+                <span className="absolute inset-x-6 bottom-0 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-accent to-primary transition-transform duration-500 group-hover:scale-x-100" />
+              </article>
             );
           })}
         </div>
