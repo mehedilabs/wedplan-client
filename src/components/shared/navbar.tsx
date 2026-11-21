@@ -57,13 +57,7 @@ function Logo({ className }: { className?: string }) {
 
       <span className="flex flex-col leading-none">
         <span className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-          Wed
-          <span className="relative inline-block">
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Plan
-            </span>
-            <span className="absolute -bottom-0.5 left-0 h-px w-full bg-gradient-to-r from-transparent via-accent to-transparent" />
-          </span>
+          Wed<span className="text-primary">Plan</span>
         </span>
         <span className="mt-0.5 hidden text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground sm:block">
           Wedding Services
