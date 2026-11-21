@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Heart, UserRound, Store, Camera, X, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,11 +38,14 @@ const MAX_SIZE = 5 * 1024 * 1024;
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const role: AccountRole =
+    searchParams.get("role") === "vendor" ? "vendor" : "customer";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [role, setRole] = useState<AccountRole>("customer");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoError, setPhotoError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,6 +57,10 @@ export default function SignupPage() {
 
     return URL.createObjectURL(profilePhoto);
   }, [profilePhoto]);
+
+  const handleRoleChange = (newRole: AccountRole) => {
+    router.replace(`/signup?role=${newRole}`, { scroll: false });
+  };
 
   const resetPhotoInput = () => {
     if (fileInputRef.current) {
@@ -104,7 +111,6 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      // Upload profile photo first, if selected
       let imageUrl: string | undefined;
 
       if (profilePhoto) {
@@ -164,7 +170,6 @@ export default function SignupPage() {
 
   return (
     <div className="rounded-3xl border border-border bg-card p-5 shadow-xl shadow-primary/5 sm:p-7">
-      {/* Header */}
       <div className="mb-5 text-center">
         <div className="mx-auto mb-3 flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-md shadow-primary/30">
           <Heart className="size-5 fill-primary-foreground text-primary-foreground" />
@@ -180,7 +185,6 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Account Role */}
         <div
           role="radiogroup"
           aria-label="Account role"
@@ -195,7 +199,7 @@ export default function SignupPage() {
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setRole(value)}
+                onClick={() => handleRoleChange(value)}
                 className={cn(
                   "flex flex-col items-center gap-1.5 cursor-pointer rounded-xl border px-1.5 py-2.5 text-center transition-all",
                   "sm:flex-row sm:gap-3 sm:px-3.5 sm:py-3 sm:text-left",
@@ -229,7 +233,6 @@ export default function SignupPage() {
           })}
         </div>
 
-        {/* Profile Photo */}
         <div>
           <div className="flex items-center gap-3 rounded-xl border border-dashed border-border p-2.5">
             <button
@@ -299,7 +302,6 @@ export default function SignupPage() {
           )}
         </div>
 
-        {/* Full Name */}
         <div className="space-y-1.5">
           <label htmlFor="name" className="text-sm font-semibold">
             Full Name
@@ -316,7 +318,6 @@ export default function SignupPage() {
           />
         </div>
 
-        {/* Business / Studio Name */}
         {role === "vendor" && (
           <div className="space-y-1.5">
             <label htmlFor="businessName" className="text-sm font-semibold">
@@ -335,7 +336,6 @@ export default function SignupPage() {
           </div>
         )}
 
-        {/* Email */}
         <div className="space-y-1.5">
           <label htmlFor="email" className="text-sm font-semibold">
             Email
@@ -352,7 +352,6 @@ export default function SignupPage() {
           />
         </div>
 
-        {/* Password */}
         <div className="space-y-1.5">
           <label htmlFor="password" className="text-sm font-semibold">
             Password
@@ -391,7 +390,6 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* Error Message */}
         {submitError && (
           <p
             role="alert"
@@ -401,7 +399,6 @@ export default function SignupPage() {
           </p>
         )}
 
-        {/* Submit */}
         <Button
           type="submit"
           disabled={isSubmitting || isGoogleLoading}
@@ -411,7 +408,6 @@ export default function SignupPage() {
         </Button>
       </form>
 
-      {/* Google Signup - Customer and Vendor */}
       <div className="my-4 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
         <span className="text-xs font-medium text-muted-foreground">OR</span>
@@ -447,7 +443,6 @@ export default function SignupPage() {
         {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
       </Button>
 
-      {/* Sign In Link */}
       <p className="mt-5 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link

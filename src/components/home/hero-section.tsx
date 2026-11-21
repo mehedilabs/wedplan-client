@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   Camera,
@@ -9,6 +12,9 @@ import {
   Sparkles,
   Utensils,
 } from "lucide-react";
+
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
 
 const categories = [
   {
@@ -40,21 +46,57 @@ const highlights = [
 ];
 
 export default function HeroSection() {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  const handleVendorClick = () => {
+    if (isPending) return;
+
+    if (!session?.user) {
+      router.push("/signup?role=vendor");
+      return;
+    }
+
+    const role = session.user.role;
+
+    if (role === "customer") {
+      toast.add({
+        title: "Customer Account Detected",
+        description: "Please logout first, then sign up with a vendor account.",
+        type: "info",
+      });
+      return;
+    }
+
+    if (role === "vendor") {
+      toast.add({
+        title: "Already a Vendor!",
+        description: "You are already registered as a vendor.",
+        type: "info",
+      });
+      return;
+    }
+
+    toast.add({
+      title: "Vendor Registration Unavailable",
+      description: "This option is only available for customer accounts.",
+      type: "info",
+    });
+  };
+
   return (
     <section className="relative isolate overflow-hidden bg-background">
       <div className="pointer-events-none absolute -top-40 left-1/4 -z-10 size-[30rem] rounded-full bg-accent/[0.10] blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-40 right-0 -z-10 size-[36rem] rounded-full bg-primary/[0.07] blur-[120px]" />
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-12 lg:pb-32 lg:pt-24">
-        {/* ══════════════ LEFT: Content ══════════════ */}
+        {/* LEFT: Content */}
         <div className="text-center lg:text-left">
-          {/* Eyebrow chip */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent/[0.12] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
             <Sparkles className="size-3" />
             Your dream wedding
           </div>
 
-          {/* Heading */}
           <h1 className="font-heading text-[2.5rem] font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl sm:leading-[1.02] xl:text-[4.5rem]">
             Where love
             <br />
@@ -63,13 +105,11 @@ export default function HeroSection() {
             perfect place
           </h1>
 
-          {/* Description */}
           <p className="mx-auto mt-7 max-w-md text-[15px] leading-7 text-muted-foreground sm:text-base sm:leading-8 lg:mx-0">
             Curated venues, talented photographers, unforgettable moments —
             everything you need to make your day truly yours.
           </p>
 
-          {/* ════════ Buttons — equal width on mobile, cream bg on secondary ════════ */}
           <div className="mx-auto mt-9 grid w-full max-w-md grid-cols-2 gap-3 sm:flex sm:max-w-none sm:justify-center sm:gap-3 lg:justify-start">
             <Link
               href="/services"
@@ -79,15 +119,16 @@ export default function HeroSection() {
               <ArrowUpRight className="hidden size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:block" />
             </Link>
 
-            <Link
-              href="/signup"
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-accent/40 bg-secondary px-4 text-[13px] font-semibold text-foreground transition-all hover:-translate-y-0.5 hover:border-accent/70 hover:bg-accent/15 sm:h-auto sm:w-auto sm:px-6 sm:py-3.5 sm:text-sm"
+            <button
+              type="button"
+              onClick={handleVendorClick}
+              disabled={isPending}
+              className="inline-flex h-12 w-full items-center cursor-pointer justify-center gap-2 rounded-full border border-accent/40 bg-secondary px-4 text-[13px] font-semibold text-foreground transition-all hover:-translate-y-0.5 hover:border-accent/70 hover:bg-accent/15 disabled:cursor-not-allowed disabled:opacity-60 sm:h-auto sm:w-auto sm:px-6 sm:py-3.5 sm:text-sm"
             >
               Join as Vendor
-            </Link>
+            </button>
           </div>
 
-          {/* ════════ Category chips — NOW VISIBLE ON MOBILE ════════ */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             {categories.map(({ label, icon: Icon, href }) => (
               <Link
@@ -101,7 +142,6 @@ export default function HeroSection() {
             ))}
           </div>
 
-          {/* Highlights */}
           <div className="mt-10 flex items-start justify-center gap-5 sm:gap-8 lg:justify-start">
             {highlights.map(({ title, text }) => (
               <div
@@ -119,7 +159,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* ══════════════ RIGHT: Collage ══════════════ */}
+        {/* RIGHT: Collage */}
         <div className="relative mx-auto aspect-square w-full max-w-[24rem] sm:max-w-md lg:max-w-xl">
           <div className="absolute inset-[15%] -z-10 rounded-full bg-accent/15 blur-[60px]" />
 
