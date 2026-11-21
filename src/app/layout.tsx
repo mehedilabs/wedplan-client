@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/shared/navbar";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Footer from "@/components/shared/footer";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <TooltipProvider>
             <Navbar />
             {children}
+            <Footer />
             <Toaster />
           </TooltipProvider>
         </Suspense>
