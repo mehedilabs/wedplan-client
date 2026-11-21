@@ -118,7 +118,6 @@ const roleMenus: Record<Role, { label: string; items: NavItem[] }> = {
         title: "Transactions",
         href: "/dashboard/admin/transactions",
         icon: Receipt,
-        isPlaceholder: true,
       },
       {
         title: "Profile Settings",
@@ -195,8 +194,14 @@ export function DashboardSidebar({
           href={`/`}
           className="group flex items-center gap-3 transition-opacity hover:opacity-90"
         >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20 ring-1 ring-primary/10">
-            <Heart className="size-5 fill-primary-foreground text-primary-foreground" />
+          <span className="group/logo relative flex size-11 shrink-0 items-center justify-center">
+            <span className="absolute inset-0 rounded-2xl bg-accent/40 blur-md transition-all duration-500 group-hover/logo:bg-accent/60 group-hover/logo:blur-lg" />
+
+            <span className="relative flex size-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/25 ring-1 ring-accent/30">
+              <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent/50 to-transparent transition-transform duration-700 group-hover/logo:translate-x-full" />
+
+              <Heart className="relative size-5 fill-primary-foreground text-primary-foreground drop-shadow" />
+            </span>
           </span>
 
           <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
