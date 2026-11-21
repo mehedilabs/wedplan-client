@@ -1,19 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowRight,
+  ArrowUpRight,
   Camera,
   Flower2,
+  Heart,
   MapPin,
   Sparkles,
   Utensils,
 } from "lucide-react";
 
 const categories = [
-  { label: "Photography", icon: Camera },
-  { label: "Venues", icon: MapPin },
-  { label: "Catering", icon: Utensils },
-  { label: "Decoration", icon: Flower2 },
+  {
+    label: "Photography",
+    icon: Camera,
+    href: "/services?category=Photography%20%26%20Videography",
+  },
+  {
+    label: "Venues",
+    icon: MapPin,
+    href: "/services?category=Wedding%20Venues",
+  },
+  {
+    label: "Catering",
+    icon: Utensils,
+    href: "/services?category=Catering%20Services",
+  },
+  {
+    label: "Decoration",
+    icon: Flower2,
+    href: "/services?category=Decoration%20%26%20Florist",
+  },
 ];
 
 const highlights = [
@@ -25,80 +42,76 @@ const highlights = [
 export default function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-background">
-      {/* Soft glows */}
-      <div className="pointer-events-none absolute -left-40 bottom-0 -z-10 size-[26rem] rounded-full bg-accent/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-32 top-1/3 -z-10 size-[30rem] rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 -z-10 size-[30rem] rounded-full bg-accent/[0.10] blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-40 right-0 -z-10 size-[36rem] rounded-full bg-primary/[0.07] blur-[120px]" />
 
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-5 pb-16 pt-8 sm:px-8 sm:pt-12 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:px-12 lg:pb-28 lg:pt-16">
-        {/* ---------- Left: Content ---------- */}
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-12 lg:pb-32 lg:pt-24">
+        {/* ══════════════ LEFT: Content ══════════════ */}
         <div className="text-center lg:text-left">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3.5 py-1.5 text-[10px] font-medium tracking-[0.14em] text-primary sm:mb-6 sm:px-4 sm:py-2 sm:text-sm sm:tracking-[0.18em]">
-            <Sparkles className="size-3.5 text-accent sm:size-4" />
-            YOUR DREAM WEDDING STARTS HERE
+          {/* Eyebrow chip */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent/[0.12] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
+            <Sparkles className="size-3" />
+            Your dream wedding
           </div>
 
-          <h1 className="font-heading text-[2.15rem] font-semibold leading-[1.12] tracking-tight text-foreground sm:text-6xl sm:leading-[1.06] xl:text-7xl">
-            Every Love Story Deserves a{" "}
-            <span className="relative inline-block italic text-primary">
-              Beautiful Beginning.
-              <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded-full bg-gradient-to-r from-accent to-transparent sm:h-[3px]" />
-            </span>
+          {/* Heading */}
+          <h1 className="font-heading text-[2.5rem] font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl sm:leading-[1.02] xl:text-[4.5rem]">
+            Where love
+            <br />
+            <span className="italic text-primary">finds its</span>
+            <br />
+            perfect place
           </h1>
 
-          <p className="mx-auto mt-5 max-w-md text-sm leading-7 text-muted-foreground sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-8 lg:mx-0">
-            From picture-perfect photography to breathtaking venues, discover
-            the wedding professionals who will make your special day
-            unforgettable.
+          {/* Description */}
+          <p className="mx-auto mt-7 max-w-md text-[15px] leading-7 text-muted-foreground sm:text-base sm:leading-8 lg:mx-0">
+            Curated venues, talented photographers, unforgettable moments —
+            everything you need to make your day truly yours.
           </p>
 
-          {/* Buttons: মোবাইলে পাশাপাশি */}
-          <div className="mx-auto mt-7 grid max-w-sm grid-cols-2 gap-3 sm:mt-9 sm:flex sm:max-w-none sm:justify-center lg:justify-start">
+          {/* ════════ Buttons — equal width on mobile, cream bg on secondary ════════ */}
+          <div className="mx-auto mt-9 grid w-full max-w-md grid-cols-2 gap-3 sm:flex sm:max-w-none sm:justify-center sm:gap-3 lg:justify-start">
             <Link
               href="/services"
-              className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3.5 text-[13px] font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 sm:gap-3 sm:px-8 sm:py-4 sm:text-sm"
+              className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-[13px] font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 sm:h-auto sm:w-auto sm:px-6 sm:py-3.5 sm:text-sm"
             >
               Explore Services
-              <ArrowRight className="hidden size-4 transition-transform duration-300 group-hover:translate-x-1 sm:block" />
+              <ArrowUpRight className="hidden size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:block" />
             </Link>
 
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-3.5 text-[13px] font-semibold text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:text-primary sm:gap-3 sm:px-8 sm:py-4 sm:text-sm"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-accent/40 bg-secondary px-4 text-[13px] font-semibold text-foreground transition-all hover:-translate-y-0.5 hover:border-accent/70 hover:bg-accent/15 sm:h-auto sm:w-auto sm:px-6 sm:py-3.5 sm:text-sm"
             >
-              Join as a Vendor
-              <ArrowRight className="hidden size-4 sm:block" />
+              Join as Vendor
             </Link>
           </div>
 
-          {/* Category chips: মোবাইলে ২×২ */}
-          <div className="hidden mx-auto mt-6 grid max-w-sm grid-cols-2 gap-2 sm:mt-9 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-2.5 lg:justify-start">
-            {categories.map(({ label, icon: Icon }) => (
+          {/* ════════ Category chips — NOW VISIBLE ON MOBILE ════════ */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            {categories.map(({ label, icon: Icon, href }) => (
               <Link
                 key={label}
-                href="/services"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-secondary px-3 py-2 text-[13px] text-secondary-foreground transition-colors hover:border-accent hover:bg-accent/15 sm:justify-start sm:px-4 sm:text-sm"
+                href={href}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card px-3 py-1.5 text-[11px] font-medium text-muted-foreground transition-all hover:border-accent/60 hover:bg-accent/5 hover:text-foreground sm:text-xs"
               >
-                <Icon className="size-3.5 text-primary sm:size-4" />
+                <Icon className="size-3.5 text-primary/70" />
                 {label}
               </Link>
             ))}
           </div>
 
           {/* Highlights */}
-          <div className="mt-9 grid grid-cols-3 gap-2 border-t border-border pt-6 sm:mt-12 sm:gap-4 sm:pt-8">
-            {highlights.map(({ title, text }, index) => (
+          <div className="mt-10 flex items-start justify-center gap-5 sm:gap-8 lg:justify-start">
+            {highlights.map(({ title, text }) => (
               <div
                 key={title}
-                className={
-                  index > 0
-                    ? "border-l border-border pl-2 sm:pl-6 lg:text-left"
-                    : "lg:text-left"
-                }
+                className="flex flex-col items-center text-center lg:items-start lg:text-left"
               >
-                <p className="font-heading text-lg font-semibold text-foreground sm:text-2xl">
+                <p className="font-heading text-sm font-semibold text-foreground sm:text-base">
                   {title}
                 </p>
-                <p className="mt-0.5 text-[10px] tracking-wide text-muted-foreground sm:mt-1 sm:text-xs">
+                <p className="mt-0.5 hidden text-[10px] uppercase tracking-wider text-muted-foreground sm:block sm:text-[11px]">
                   {text}
                 </p>
               </div>
@@ -106,54 +119,62 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* ---------- Right: Image Collage ---------- */}
-        <div className="relative mx-auto aspect-[5/6] w-full max-w-[22rem] sm:max-w-md lg:max-w-xl">
-          {/* Dotted decoration */}
-          <div
-            className="pointer-events-none absolute -bottom-3 left-[30%] -z-10 h-20 w-32 opacity-70 sm:h-24 sm:w-40"
-            style={{
-              backgroundImage:
-                "radial-gradient(var(--accent) 1.5px, transparent 1.5px)",
-              backgroundSize: "14px 14px",
-            }}
-          />
+        {/* ══════════════ RIGHT: Collage ══════════════ */}
+        <div className="relative mx-auto aspect-square w-full max-w-[24rem] sm:max-w-md lg:max-w-xl">
+          <div className="absolute inset-[15%] -z-10 rounded-full bg-accent/15 blur-[60px]" />
 
-          {/* Gold offset frame */}
-          <div className="absolute right-[-3%] top-[5%] h-[88%] w-[62%] rounded-t-full rounded-b-3xl border-2 border-accent/60" />
-
-          {/* Main arch image */}
-          <div className="absolute right-0 top-0 h-[88%] w-[62%] overflow-hidden rounded-t-full rounded-b-3xl border-[3px] border-card shadow-2xl shadow-primary/20 sm:border-4">
+          <div className="absolute bottom-0 left-0 h-[86%] w-[64%] overflow-hidden rounded-t-[8rem] rounded-b-3xl shadow-[0_30px_60px_-20px] shadow-primary/25">
             <Image
               src="/images/hero/hero-center.jpg"
               alt="Happy couple on their wedding day"
               fill
               priority
-              sizes="(min-width: 1024px) 28vw, 60vw"
+              sizes="(min-width: 1024px) 30vw, 60vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
           </div>
 
-          {/* Left tilted image */}
-          <div className="absolute left-0 top-[26%] h-[46%] w-[40%] -rotate-3 overflow-hidden rounded-2xl border-[3px] border-card shadow-xl shadow-primary/15 sm:rounded-3xl sm:border-4">
-            <Image
-              src="/images/hero/hero-left.jpg"
-              alt="Wedding flowers and decoration"
-              fill
-              sizes="(min-width: 1024px) 18vw, 40vw"
-              className="object-cover"
-            />
+          <div className="absolute right-0 top-4 aspect-[4/5] w-[42%] rotate-3 rounded-2xl bg-card p-1.5 shadow-[0_15px_40px_-10px] shadow-primary/20">
+            <div className="relative h-full w-full overflow-hidden rounded-xl">
+              <Image
+                src="/images/hero/hero-left.jpg"
+                alt="Wedding flowers and decoration"
+                fill
+                sizes="(min-width: 1024px) 18vw, 40vw"
+                className="object-cover"
+              />
+            </div>
           </div>
 
-          {/* Bottom circle image */}
-          <div className="absolute bottom-0 right-[10%] aspect-square w-[30%] overflow-hidden rounded-full border-[3px] border-card shadow-xl shadow-primary/20 sm:border-4">
+          <div className="absolute bottom-[6%] right-[6%] aspect-square w-[34%] overflow-hidden rounded-full border-[6px] border-background shadow-2xl shadow-primary/25">
             <Image
               src="/images/hero/hero-right.jpg"
               alt="Beautiful wedding venue"
               fill
-              sizes="(min-width: 1024px) 14vw, 30vw"
+              sizes="(min-width: 1024px) 16vw, 34vw"
               className="object-cover"
             />
+          </div>
+
+          <svg
+            className="pointer-events-none absolute -left-2 top-0 size-20 text-accent/40 sm:size-24"
+            viewBox="0 0 100 100"
+            fill="none"
+            aria-hidden
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="44"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeDasharray="3 7"
+            />
+          </svg>
+
+          <div className="pointer-events-none absolute right-[8%] top-[46%] flex size-8 items-center justify-center rounded-full bg-white shadow-md">
+            <Heart className="size-3.5 fill-accent text-accent" />
           </div>
         </div>
       </div>
