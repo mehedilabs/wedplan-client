@@ -44,7 +44,8 @@ export default function LoginPage() {
 
       if (!userRole) {
         const sessionRes = await authClient.getSession();
-        userRole = (sessionRes?.data?.user as { role?: string } | undefined)?.role;
+        userRole = (sessionRes?.data?.user as { role?: string } | undefined)
+          ?.role;
       }
 
       const targetDashboard =
@@ -133,15 +134,6 @@ export default function LoginPage() {
             autoComplete="current-password"
             required
           />
-        </div>
-
-        <div className="text-right">
-          <Link
-            href="/forgot-password"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            Forgot password?
-          </Link>
         </div>
 
         {/* Error Message */}

@@ -39,9 +39,9 @@ function getStatusStyles(status: Service["status"]) {
 }
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-BD", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "BDT",
+    currency: "USD",
     maximumFractionDigits: 0,
   }).format(price);
 }
@@ -74,16 +74,6 @@ export default function VendorServicesPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   async function handleToggleAvailability(service: Service) {
-    if (service.status !== "approved") {
-      toast.add({
-        title: "Cannot change availability",
-        description:
-          "Only approved services can have their availability managed.",
-        type: "error",
-      });
-      return;
-    }
-
     const serviceId = String(service._id);
     const nextState = !service.isActive;
 
@@ -99,17 +89,19 @@ export default function VendorServicesPage() {
       );
 
       toast.add({
-        title: nextState
-          ? "Service is now Available"
-          : "Service is now Unavailable",
+        title: nextState ? "Service Activated" : "Service Deactivated",
         description: nextState
-          ? "Your service is now visible for bookings."
-          : "Your service is currently hidden from public bookings.",
+          ? service.status === "pending"
+            ? "Your service is active, but it is still awaiting admin approval. Once approved, it will be visible to customers."
+            : "Your service is now active and available for public browsing."
+          : service.status === "pending"
+            ? "Your service is inactive. Even after admin approval, it will remain hidden from customers until you activate it."
+            : "Your service is inactive and hidden from public bookings.",
         type: "success",
       });
     } catch (err) {
       toast.add({
-        title: "Failed to update availability",
+        title: "Failed to update service status",
         description:
           err instanceof Error
             ? err.message
@@ -357,13 +349,17 @@ export default function VendorServicesPage() {
                     {formatPrice(service.price)}
                   </span>
 
-                  {service.status === "approved" ? (
+                  {service.status !== "rejected" ? (
                     <div
                       role="group"
-                      aria-label="Service availability"
+                      aria-label="Service status"
                       aria-busy={togglingId === String(service._id)}
                       className="inline-flex items-center rounded-full border border-border bg-muted/70 p-1"
                     >
+                      {togglingId === String(service._id) && (
+                        <LoaderCircle className="mx-2 size-3.5 animate-spin text-primary" />
+                      )}
+
                       <button
                         type="button"
                         aria-pressed={service.isActive}
@@ -374,17 +370,13 @@ export default function VendorServicesPage() {
                           }
                         }}
                         className={cn(
-                          "inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
+                          "inline-flex cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
                           service.isActive
                             ? "bg-primary text-primary-foreground shadow-sm"
                             : "text-muted-foreground hover:bg-background hover:text-foreground",
                         )}
                       >
-                        {togglingId === String(service._id) &&
-                        service.isActive ? (
-                          <LoaderCircle className="size-3 animate-spin" />
-                        ) : null}
-                        Available
+                        Active
                       </button>
 
                       <button
@@ -397,24 +389,17 @@ export default function VendorServicesPage() {
                           }
                         }}
                         className={cn(
-                          "inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
+                          "inline-flex cursor-pointer items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60",
                           !service.isActive
                             ? "bg-primary text-primary-foreground shadow-sm"
                             : "text-muted-foreground hover:bg-background hover:text-foreground",
                         )}
                       >
-                        {togglingId === String(service._id) &&
-                        !service.isActive ? (
-                          <LoaderCircle className="size-3 animate-spin" />
-                        ) : null}
-                        Unavailable
+                        Inactive
                       </button>
                     </div>
                   ) : (
-                    <span
-                      className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold text-muted-foreground"
-                      title="Availability can be managed once approved"
-                    >
+                    <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">
                       {service.isActive ? "Active" : "Inactive"}
                     </span>
                   )}
@@ -436,7 +421,7 @@ export default function VendorServicesPage() {
                 <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
                   <Button
                     variant="outline"
-                    className="rounded-xl cursor-pointer"
+                    className="cursor-pointer rounded-xl"
                     onClick={() => setEditingService(service)}
                   >
                     <Pencil className="mr-2 size-4" />
@@ -445,7 +430,7 @@ export default function VendorServicesPage() {
 
                   <Button
                     variant="outline"
-                    className="rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive cursor-pointer"
+                    className="cursor-pointer rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
                     onClick={() => setDeletingService(service)}
                   >
                     <Trash2 className="mr-2 size-4" />
@@ -494,7 +479,7 @@ export default function VendorServicesPage() {
                 type="button"
                 onClick={() => setDeletingService(null)}
                 disabled={isDeleting}
-                className="flex size-8 items-center justify-center cursor-pointer rounded-full text-muted-foreground transition hover:bg-muted disabled:opacity-50"
+                className="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted disabled:opacity-50"
                 aria-label="Close delete confirmation"
               >
                 <X className="size-4" />
@@ -522,7 +507,7 @@ export default function VendorServicesPage() {
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
-                className="rounded-full cursor-pointer"
+                className="cursor-pointer rounded-full"
                 disabled={isDeleting}
                 onClick={() => setDeletingService(null)}
               >
@@ -530,7 +515,7 @@ export default function VendorServicesPage() {
               </Button>
 
               <Button
-                className="rounded-full bg-destructive cursor-pointer text-white hover:bg-destructive/90"
+                className="cursor-pointer rounded-full bg-destructive text-white hover:bg-destructive/90"
                 disabled={isDeleting}
                 onClick={() => void handleDeleteService()}
               >

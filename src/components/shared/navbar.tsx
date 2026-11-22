@@ -396,14 +396,21 @@ export default function Navbar() {
   const handleLogout = async () => {
     setLogoutError("");
     setIsLoggingOut(true);
+
     try {
       invalidateAuthToken();
+
       const { error } = await authClient.signOut();
+
       if (error) {
         setLogoutError(error.message || "Unable to sign out.");
         setIsLoggingOut(false);
         return;
       }
+
+      // Reset the loading state after successful logout
+      setIsLoggingOut(false);
+
       closeAllDropdowns();
       router.replace("/");
       router.refresh();
