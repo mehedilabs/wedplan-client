@@ -4,6 +4,7 @@ import { ArrowRight, Heart, Sparkles } from "lucide-react";
 import ServiceCard from "@/components/services/service-card";
 import { getServices } from "@/lib/api/service-api";
 import type { Service } from "@/types/service";
+import { connection } from "next/server";
 
 async function getFeaturedServices(): Promise<Service[]> {
   try {
@@ -16,6 +17,8 @@ async function getFeaturedServices(): Promise<Service[]> {
 }
 
 export default async function FeaturedServicesSection() {
+  await connection();
+
   const services = await getFeaturedServices();
 
   return (

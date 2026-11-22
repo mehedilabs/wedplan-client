@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -17,6 +17,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const user = session?.user;
 
   const rawRole = (user as { role?: string } | undefined)?.role;
+
   const role: Role | null =
     rawRole === "admin" || rawRole === "vendor" || rawRole === "customer"
       ? rawRole
@@ -28,6 +29,26 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <>
       <DashboardRouteGuard role={role} isPending={isPending} hasUser={!!user} />
 
+      <SidebarProvider defaultOpen={true}>
+        {!isDashboardHidden && (
+          <Suspense fallback={null}>
+            <DashboardSidebar role={role!} user={user!} />
+          </Suspense>
+        )}
+
+        <SidebarInset className="flex min-h-svh flex-1 flex-col bg-muted/30">
+          {!isDashboardHidden && (
+            <Suspense fallback={null}>
+              <DashboardHeader role={role!} user={user!} />
+            </Suspense>
+          )}
+
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto w-full max-w-7xl">{children}</div>
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+
       {isDashboardHidden && (
         <DashboardLoader
           fullScreen
@@ -38,20 +59,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               : "Please sign in to continue."
           }
         />
-      )}
-
-      {!isDashboardHidden && (
-        <SidebarProvider defaultOpen={true}>
-          <DashboardSidebar role={role!} user={user!} />
-
-          <SidebarInset className="flex min-h-svh flex-1 flex-col bg-muted/30">
-            <DashboardHeader role={role!} user={user!} />
-
-            <main className="flex-1 p-4 sm:p-6 lg:p-8">
-              <div className="mx-auto w-full max-w-7xl">{children}</div>
-            </main>
-          </SidebarInset>
-        </SidebarProvider>
       )}
     </>
   );

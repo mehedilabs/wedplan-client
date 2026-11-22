@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 
@@ -10,9 +11,7 @@ interface ServiceDetailsPageProps {
   }>;
 }
 
-export default async function ServiceDetailsPage({
-  params,
-}: ServiceDetailsPageProps) {
+async function ServiceDetailsContent({ params }: ServiceDetailsPageProps) {
   await connection();
 
   const { id } = await params;
@@ -26,4 +25,20 @@ export default async function ServiceDetailsPage({
   }
 
   return <ServiceDetails service={service} />;
+}
+
+export default function ServiceDetailsPage({
+  params,
+}: ServiceDetailsPageProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <p>Loading service details...</p>
+        </div>
+      }
+    >
+      <ServiceDetailsContent params={params} />
+    </Suspense>
+  );
 }
