@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Heart, Sparkles } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 
 import ServiceCard from "@/components/services/service-card";
 import { getServices } from "@/lib/api/service-api";
@@ -22,7 +22,7 @@ export default async function FeaturedServicesSection() {
   const services = await getFeaturedServices();
 
   return (
-    <section className="relative isolate overflow-hidden bg-background px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+    <section className="relative isolate overflow-hidden bg-background px-5 py-10 sm:px-8 sm:py-28 lg:px-12">
       {/* Soft decorative glows */}
       <div className="pointer-events-none absolute -left-32 top-24 -z-10 size-96 rounded-full bg-accent/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-32 bottom-24 -z-10 size-[26rem] rounded-full bg-primary/5 blur-3xl" />
@@ -31,11 +31,9 @@ export default async function FeaturedServicesSection() {
         {/* ---------- Section Heading ---------- */}
         <div className="mx-auto max-w-2xl text-center">
           <div className="flex items-center justify-center gap-4">
-            <span className="h-px w-10 bg-gradient-to-r from-transparent to-accent sm:w-16" />
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
               Handpicked for Your Celebration
             </p>
-            <span className="h-px w-10 bg-gradient-to-l from-transparent to-accent sm:w-16" />
           </div>
 
           <h2 className="mt-5 font-heading text-4xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -111,7 +109,6 @@ export default async function FeaturedServicesSection() {
           <div className="relative flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
             <div>
               <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                <Sparkles className="size-4" />
                 For Wedding Professionals
               </p>
               <h3 className="mt-3 font-heading text-3xl font-semibold sm:text-4xl">

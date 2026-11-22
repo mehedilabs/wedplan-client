@@ -8,6 +8,7 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/components/ui/toast";
 
 import type { Metadata } from "next";
 
@@ -60,6 +61,12 @@ export default function LoginForm() {
           : userRole === "admin"
             ? "/dashboard/admin"
             : "/dashboard/customer";
+
+      toast.add({
+        title: "Login successful!",
+        description: "Welcome back to WedPlan.",
+        type: "success",
+      });
 
       router.replace(targetDashboard);
       router.refresh();

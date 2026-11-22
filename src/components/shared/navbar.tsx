@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/toast";
 
 const navLinks = [
   { name: "Home", href: "/", icon: Home },
@@ -410,6 +411,12 @@ export default function Navbar() {
 
       // Reset the loading state after successful logout
       setIsLoggingOut(false);
+
+      toast.add({
+        title: "Logged out successfully!",
+        description: "You have been signed out of your account.",
+        type: "success",
+      });
 
       closeAllDropdowns();
       router.replace("/");

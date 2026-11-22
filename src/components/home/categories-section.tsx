@@ -53,7 +53,7 @@ const CATEGORIES: CategoryDefinition[] = [
 
 export default function CategoriesSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-background px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
+    <section className="relative isolate overflow-hidden bg-background px-5 py-14 sm:px-8 sm:py-24 lg:px-12">
       {/* Decorative ambient background glows */}
       <div className="pointer-events-none absolute -left-32 top-1/3 -z-10 size-96 rounded-full bg-accent/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-32 bottom-1/4 -z-10 size-96 rounded-full bg-primary/5 blur-3xl" />

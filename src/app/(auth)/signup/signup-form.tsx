@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { uploadProfileImage } from "@/lib/api/service-api";
+import { toast } from "@/components/ui/toast";
 
 type AccountRole = "customer" | "vendor";
 
@@ -131,6 +132,12 @@ export default function SignupForm() {
         setSubmitError(error.message || "Unable to create account.");
         return;
       }
+
+      toast.add({
+        title: "Account created successfully!",
+        description: "Welcome to WedPlan.",
+        type: "success",
+      });
 
       router.replace("/");
       router.refresh();

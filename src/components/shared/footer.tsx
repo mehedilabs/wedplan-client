@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 type QuickLink = {
   name: string;
   href: string;
-  // ture hole toast dekhabe ..page e jabe na
+  // true hole toast dekhabe, page e jabe na
   guestOnly?: boolean;
 };
 
@@ -85,7 +85,7 @@ function FooterSection({
         >
           {title}
 
-          {/* + system for mobile ...my favorite idea */}
+          {/* + system for mobile */}
           <span
             aria-hidden="true"
             className={cn(
@@ -145,7 +145,7 @@ export default function Footer() {
     });
   };
 
-  // login user Sign In / Create Account- e click korle toast dekhabe
+  // login user Sign In / Create Account click korle toast dekhabe
   const handleGuestLink = (
     event: React.MouseEvent<HTMLAnchorElement>,
     link: QuickLink,
@@ -182,28 +182,28 @@ export default function Footer() {
           {/* ---------- Brand ---------- */}
           <div className="pb-8 sm:col-span-2 sm:pb-0 lg:col-span-1">
             <Link href="/" className="group inline-flex items-center gap-3">
-              <span className="relative flex size-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20 ring-1 ring-accent/30">
+              <span className="relative flex size-9 sm:size-11 items-center justify-center overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/20 ring-1 ring-accent/30">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                <Heart className="relative size-5 fill-primary-foreground text-primary-foreground" />
+                <Heart className="relative size-4 sm:size-5 fill-primary-foreground text-primary-foreground" />
               </span>
 
               <span className="flex flex-col leading-none">
-                <span className="font-heading text-2xl font-bold tracking-tight text-foreground">
+                <span className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                   Wed<span className="text-primary">Plan</span>
                 </span>
-                <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="mt-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:text-[9px] sm:tracking-[0.22em]">
                   Wedding Services
                 </span>
               </span>
             </Link>
 
-            <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">
+            <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground text-center sm:text-left">
               Your dream wedding starts here. Discover trusted vendors, explore
               beautiful services, and turn your special day into unforgettable
               memories with WedPlan.
             </p>
 
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1.5 text-xs font-medium italic text-primary">
+            <p className="mt-4 flex w-fit items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1.5 text-xs font-medium italic text-primary mx-auto sm:mx-0">
               <Heart className="size-3.5 fill-primary/30" />
               Made with love for your special day.
             </p>
@@ -311,9 +311,9 @@ export default function Footer() {
               © {new Date().getFullYear()} WedPlan. All rights reserved.
             </p>
 
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <p className="flex items-center gap-1 whitespace-nowrap text-[10px] text-muted-foreground sm:gap-1.5 sm:text-xs">
               Designed with
-              <Heart className="size-3 fill-primary text-primary" />
+              <Heart className="size-3 shrink-0 fill-primary text-primary" />
               for couples planning their dream wedding.
             </p>
           </div>

@@ -178,6 +178,12 @@ export function ProfileSettingsForm({ role, user }: ProfileSettingsFormProps) {
         return;
       }
 
+      toast.add({
+        title: "Logged out successfully!",
+        description: "You have been signed out of your account.",
+        type: "success",
+      });
+
       setLogoutDialogOpen(false);
       router.replace("/");
       router.refresh();

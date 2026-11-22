@@ -9,7 +9,6 @@ import {
   Flower2,
   Heart,
   MapPin,
-  Sparkles,
   Utensils,
 } from "lucide-react";
 
@@ -89,11 +88,10 @@ export default function HeroSection() {
       <div className="pointer-events-none absolute -top-40 left-1/4 -z-10 size-[30rem] rounded-full bg-accent/[0.10] blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-40 right-0 -z-10 size-[36rem] rounded-full bg-primary/[0.07] blur-[120px]" />
 
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-12 lg:pb-32 lg:pt-24">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-14 px-5 pb-12 pt-10 sm:px-8 sm:pt-20 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:px-12 lg:pb-32 lg:pt-24">
         {/* LEFT: Content */}
         <div className="text-center lg:text-left">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent/[0.12] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-            <Sparkles className="size-3" />
             Your dream wedding
           </div>
 

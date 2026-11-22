@@ -39,7 +39,7 @@ export default function WhyChooseWedPlan() {
   const FeaturedIcon = featured.icon;
 
   return (
-    <section className="relative isolate overflow-hidden bg-background px-4 py-14 sm:px-8 sm:py-24 lg:px-12 lg:py-28">
+    <section className="relative isolate overflow-hidden bg-background px-4 py-10 sm:px-8 sm:py-24 lg:px-12 lg:py-28">
       {/* Soft glows */}
       <div className="pointer-events-none absolute -left-40 top-20 -z-10 size-96 rounded-full bg-accent/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 bottom-20 -z-10 size-[28rem] rounded-full bg-primary/5 blur-3xl" />

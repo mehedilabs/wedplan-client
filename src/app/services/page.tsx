@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Sparkles } from "lucide-react";
+
 import ServicesContent from "./_components/services-content";
 
 export const metadata: Metadata = {
@@ -42,7 +42,6 @@ export default function ServicesPage() {
         {/* Header from Reference Screenshot */}
         <div className="mb-8">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="size-3.5 fill-primary/20 text-primary" />
             Curated Wedding Marketplace
           </span>
 
