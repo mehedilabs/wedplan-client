@@ -16,10 +16,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  const role = ((user as { role?: string } | undefined)?.role ||
-    "customer") as Role;
+  const rawRole = (user as { role?: string } | undefined)?.role;
+  const role: Role | null =
+    rawRole === "admin" || rawRole === "vendor" || rawRole === "customer"
+      ? rawRole
+      : null;
 
-  const isDashboardHidden = isPending || !user;
+  const isDashboardHidden = isPending || !user || !role;
 
   return (
     <>
@@ -37,19 +40,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         />
       )}
 
-      <div className={isDashboardHidden ? "hidden" : ""}>
+      {!isDashboardHidden && (
         <SidebarProvider defaultOpen={true}>
-          <DashboardSidebar role={role} user={user!} />
+          <DashboardSidebar role={role!} user={user!} />
 
           <SidebarInset className="flex min-h-svh flex-1 flex-col bg-muted/30">
-            <DashboardHeader role={role} user={user!} />
+            <DashboardHeader role={role!} user={user!} />
 
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
               <div className="mx-auto w-full max-w-7xl">{children}</div>
             </main>
           </SidebarInset>
         </SidebarProvider>
-      </div>
+      )}
     </>
   );
 }

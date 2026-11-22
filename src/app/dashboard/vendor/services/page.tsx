@@ -17,7 +17,7 @@ import {
 import { toast } from "@/components/ui/toast";
 
 import { authClient } from "@/lib/auth-client";
-import { getVendorServices, deleteService } from "@/lib/api/service-api";
+import { getVendorServices, deleteService, updateServiceAvailability } from "@/lib/api/service-api";
 import { Button } from "@/components/ui/button";
 import EditServiceDialog from "./_components/edit-service-dialog";
 import type { Service } from "@/types/service";
@@ -67,6 +67,50 @@ export default function VendorServicesPage() {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [deletingService, setDeletingService] = useState<Service | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  async function handleToggleAvailability(service: Service) {
+    if (service.status !== "approved") {
+      toast.add({
+        title: "Cannot change availability",
+        description: "Only approved services can have their availability managed.",
+        type: "error",
+      });
+      return;
+    }
+
+    const serviceId = String(service._id);
+    const nextState = !service.isActive;
+
+    setTogglingId(serviceId);
+
+    try {
+      await updateServiceAvailability(serviceId, nextState);
+
+      setServices((prev) =>
+        prev.map((item) =>
+          item._id === service._id ? { ...item, isActive: nextState } : item,
+        ),
+      );
+
+      toast.add({
+        title: nextState ? "Service is now Available" : "Service is now Unavailable",
+        description: nextState
+          ? "Your service is now visible for bookings."
+          : "Your service is currently hidden from public bookings.",
+        type: "success",
+      });
+    } catch (err) {
+      toast.add({
+        title: "Failed to update availability",
+        description:
+          err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setTogglingId(null);
+    }
+  }
 
   const fetchServices = useCallback(async () => {
     if (isPending) return;
@@ -304,16 +348,39 @@ export default function VendorServicesPage() {
                     {formatPrice(service.price)}
                   </span>
 
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-1 text-[10px] font-semibold",
-                      service.isActive
-                        ? "bg-green-50 text-green-700"
-                        : "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    {service.isActive ? "Active" : "Inactive"}
-                  </span>
+                  {service.status === "approved" ? (
+                    <button
+                      type="button"
+                      disabled={togglingId === String(service._id)}
+                      onClick={() => void handleToggleAvailability(service)}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-all cursor-pointer hover:opacity-85 disabled:opacity-50",
+                        service.isActive
+                          ? "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80",
+                      )}
+                      title="Click to toggle availability"
+                    >
+                      {togglingId === String(service._id) ? (
+                        <LoaderCircle className="size-3 animate-spin" />
+                      ) : (
+                        <span
+                          className={cn(
+                            "size-1.5 rounded-full",
+                            service.isActive ? "bg-green-600" : "bg-muted-foreground",
+                          )}
+                        />
+                      )}
+                      {service.isActive ? "Available" : "Unavailable"}
+                    </button>
+                  ) : (
+                    <span
+                      className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold text-muted-foreground"
+                      title="Availability can be managed once approved"
+                    >
+                      {service.isActive ? "Active" : "Inactive"}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">

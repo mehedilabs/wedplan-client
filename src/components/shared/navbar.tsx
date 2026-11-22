@@ -22,6 +22,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import { invalidateAuthToken } from "@/lib/api/api-client";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -396,6 +397,7 @@ export default function Navbar() {
     setLogoutError("");
     setIsLoggingOut(true);
     try {
+      invalidateAuthToken();
       const { error } = await authClient.signOut();
       if (error) {
         setLogoutError(error.message || "Unable to sign out.");

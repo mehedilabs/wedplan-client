@@ -86,7 +86,11 @@ export default function CustomerBookingsPage() {
       await cancelBooking(bookingId, customerId);
 
       setBookings((currentBookings) =>
-        currentBookings.filter((booking) => booking._id !== bookingId),
+        currentBookings.map((booking) =>
+          booking._id === bookingId
+            ? { ...booking, status: "cancelled" }
+            : booking,
+        ),
       );
 
       setSuccess("Your booking has been cancelled successfully.");

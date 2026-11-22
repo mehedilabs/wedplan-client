@@ -1,11 +1,12 @@
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface CreateBookingData {
+export interface CreateBookingData {
   serviceId: string;
-  customerId: string;
-  customerName: string;
-  customerEmail: string;
+  customerId?: string;
+  customerName?: string;
+  customerEmail?: string;
   eventDate: string;
   eventLocation: string;
   message: string;
@@ -42,7 +43,7 @@ export interface CustomerBooking {
 // Check whether the customer already has an active booking
 export async function getBookingStatus(
   serviceId: string,
-  customerId: string,
+  customerId?: string,
 ): Promise<boolean> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
@@ -50,10 +51,10 @@ export async function getBookingStatus(
 
   const params = new URLSearchParams({
     serviceId,
-    customerId,
+    ...(customerId ? { customerId } : {}),
   });
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/status?${params.toString()}`,
     { cache: "no-store" },
   );
@@ -67,7 +68,7 @@ export async function getBookingStatus(
   return result.data.hasActiveBooking;
 }
 
-// Create a customer booking request
+// Create a customer booking request (authenticated customer)
 export async function createBooking(
   bookingData: CreateBookingData,
 ): Promise<void> {
@@ -75,7 +76,7 @@ export async function createBooking(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(`${API_URL}/bookings`, {
+  const response = await fetchWithAuth(`${API_URL}/bookings`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -90,8 +91,7 @@ export async function createBooking(
   }
 }
 
-
-// Get all bookings submitted by a customer
+// Get all bookings submitted by a customer (authenticated customer or admin)
 export async function getCustomerBookings(
   customerId: string,
 ): Promise<CustomerBooking[]> {
@@ -99,7 +99,7 @@ export async function getCustomerBookings(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/customer/${encodeURIComponent(customerId)}`,
     { cache: "no-store" },
   );
@@ -113,16 +113,16 @@ export async function getCustomerBookings(
   return result.data;
 }
 
-// Cancel a customer's pending booking
+// Cancel a customer's pending booking (authenticated customer owner)
 export async function cancelBooking(
   bookingId: string,
-  customerId: string,
+  customerId?: string,
 ): Promise<void> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/${bookingId}/cancel`,
     {
       method: "PATCH",
@@ -158,7 +158,7 @@ export interface VendorBooking {
   image: string | null;
 }
 
-// Get all booking requests submitted to a vendor
+// Get all booking requests submitted to a vendor (authenticated vendor or admin)
 export async function getVendorBookings(
   vendorId: string,
 ): Promise<VendorBooking[]> {
@@ -166,7 +166,7 @@ export async function getVendorBookings(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/vendor/${encodeURIComponent(vendorId)}`,
     { cache: "no-store" },
   );
@@ -180,16 +180,16 @@ export async function getVendorBookings(
   return result.data;
 }
 
-// Accept a pending booking request
+// Accept a pending booking request (authenticated vendor owner)
 export async function acceptBooking(
   bookingId: string,
-  vendorId: string,
+  vendorId?: string,
 ): Promise<void> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/${bookingId}/accept`,
     {
       method: "PATCH",
@@ -207,16 +207,16 @@ export async function acceptBooking(
   }
 }
 
-// Reject a pending booking request
+// Reject a pending booking request (authenticated vendor owner)
 export async function rejectBooking(
   bookingId: string,
-  vendorId: string,
+  vendorId?: string,
 ): Promise<void> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/bookings/${bookingId}/reject`,
     {
       method: "PATCH",

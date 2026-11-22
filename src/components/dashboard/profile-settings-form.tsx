@@ -17,6 +17,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import { invalidateAuthToken } from "@/lib/api/api-client";
 import { uploadProfileImage } from "@/lib/api/service-api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -164,6 +165,7 @@ export function ProfileSettingsForm({ role, user }: ProfileSettingsFormProps) {
     setIsLoggingOut(true);
 
     try {
+      invalidateAuthToken();
       const { error } = await authClient.signOut();
 
       if (error) {

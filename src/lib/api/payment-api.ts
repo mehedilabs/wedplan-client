@@ -1,3 +1,4 @@
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,8 +26,7 @@ export async function getVendorSubscription(): Promise<VendorSubscription> {
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(`${API_URL}/payments/subscription`, {
-    credentials: "include",
+  const response = await fetchWithAuth(`${API_URL}/payments/subscription`, {
     cache: "no-store",
   });
 

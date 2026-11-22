@@ -394,6 +394,17 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                           Your booking request has been submitted successfully.
                           The service provider will review your request.
                         </p>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBookingSuccess(false);
+                            setIsBookingFormOpen(true);
+                          }}
+                          className="mt-4 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary underline underline-offset-4 hover:text-primary/80 cursor-pointer"
+                        >
+                          Book this service for another date
+                        </button>
                       </div>
                     ) : (
                       <>

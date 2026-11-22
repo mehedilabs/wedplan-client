@@ -1,5 +1,5 @@
-
 import type { Service } from "@/types/service";
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,10 +19,10 @@ interface ImageUploadData {
   url: string;
 }
 
-interface CreateServiceData {
-  vendorId: string;
-  vendorName: string;
-  vendorEmail: string;
+export interface CreateServiceData {
+  vendorId?: string;
+  vendorName?: string;
+  vendorEmail?: string;
   serviceName: string;
   category: string;
   description: string;
@@ -31,8 +31,8 @@ interface CreateServiceData {
   images: string[];
 }
 
-interface UpdateServiceData {
-  vendorId: string;
+export interface UpdateServiceData {
+  vendorId?: string;
   serviceName: string;
   category: string;
   description: string;
@@ -41,7 +41,7 @@ interface UpdateServiceData {
   images: string[];
 }
 
-// Get all approved and active services
+// Get all approved and active services (public)
 export async function getServices(): Promise<Service[]> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
@@ -64,7 +64,7 @@ export async function getServices(): Promise<Service[]> {
   return result.data;
 }
 
-// Get a single service by ID
+// Get a single service by ID (public for approved+active, owner/admin for unpublished)
 export async function getServiceById(
   serviceId: string,
 ): Promise<Service> {
@@ -72,7 +72,7 @@ export async function getServiceById(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/services/${encodeURIComponent(serviceId)}`,
     {
       cache: "no-store",
@@ -88,8 +88,7 @@ export async function getServiceById(
   return result.data;
 }
 
-
- // Get all services created by a specific vendor
+// Get all services created by a specific vendor (vendor owner or admin)
 export async function getVendorServices(
   vendorId: string,
 ): Promise<Service[]> {
@@ -97,7 +96,7 @@ export async function getVendorServices(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/services/vendor/${encodeURIComponent(vendorId)}`,
     {
       cache: "no-store",
@@ -117,8 +116,7 @@ export async function getVendorServices(
   return result.data;
 }
 
-
-// Upload a single service image to ImgBB
+// Upload an authenticated vendor service image to ImgBB
 export async function uploadServiceImage(file: File): Promise<string> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
@@ -127,21 +125,24 @@ export async function uploadServiceImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const response = await fetch(`${API_URL}/services/upload-image`, {
-    method: "POST",
-    body: formData,
-  });
+  const response = await fetchWithAuth(
+    `${API_URL}/services/upload-service-image`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
 
   const result: ApiResponse<ImageUploadData> = await response.json();
 
   if (!response.ok || !result.success) {
-    throw new Error(result.message || "Image upload failed");
+    throw new Error(result.message || "Service image upload failed");
   }
 
   return result.data.url;
 }
 
-// Upload a profile image to ImgBB
+// Upload a profile image to ImgBB (used during signup and profile settings)
 export async function uploadProfileImage(file: File): Promise<string> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
@@ -152,6 +153,7 @@ export async function uploadProfileImage(file: File): Promise<string> {
 
   const response = await fetch(`${API_URL}/services/upload-image`, {
     method: "POST",
+    credentials: "include",
     body: formData,
   });
 
@@ -164,7 +166,7 @@ export async function uploadProfileImage(file: File): Promise<string> {
   return result.data.url;
 }
 
-// Create a new service
+// Create a new service (authenticated vendor)
 export async function createService(
   serviceData: CreateServiceData,
 ): Promise<void> {
@@ -172,7 +174,7 @@ export async function createService(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(`${API_URL}/services`, {
+  const response = await fetchWithAuth(`${API_URL}/services`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -187,8 +189,7 @@ export async function createService(
   }
 }
 
-
-// Update an existing service
+// Update an existing service (authenticated vendor owner)
 export async function updateService(
   serviceId: string,
   serviceData: UpdateServiceData,
@@ -197,7 +198,7 @@ export async function updateService(
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/services/${encodeURIComponent(serviceId)}`,
     {
       method: "PATCH",
@@ -215,16 +216,16 @@ export async function updateService(
   }
 }
 
-// Delete an existing service
+// Delete an existing service (authenticated vendor owner)
 export async function deleteService(
   serviceId: string,
-  vendorId: string,
+  vendorId?: string,
 ): Promise<void> {
   if (!API_URL) {
     throw new Error("API URL is not configured");
   }
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/services/${encodeURIComponent(serviceId)}`,
     {
       method: "DELETE",
@@ -239,5 +240,32 @@ export async function deleteService(
 
   if (!response.ok || !result.success) {
     throw new Error(result.message || "Failed to delete service");
+  }
+}
+
+// Update service availability (active / inactive) by vendor owner
+export async function updateServiceAvailability(
+  serviceId: string,
+  isActive: boolean,
+): Promise<void> {
+  if (!API_URL) {
+    throw new Error("API URL is not configured");
+  }
+
+  const response = await fetchWithAuth(
+    `${API_URL}/services/${encodeURIComponent(serviceId)}/availability`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isActive }),
+    },
+  );
+
+  const result: ApiResponse<unknown> = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || "Failed to update service availability");
   }
 }

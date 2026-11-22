@@ -1,4 +1,5 @@
 import type { Transaction } from "@/types/transaction";
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -10,12 +11,11 @@ interface ApiMessageResponse {
  * Fetch all platform transactions with vendor details for the admin dashboard
  */
 export async function getAdminTransactions(): Promise<Transaction[]> {
-  const response = await fetch(`${API_URL}/admin/transactions`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/transactions`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     cache: "no-store",
   });
 

@@ -7,7 +7,6 @@ import {
   Loader2,
   ShieldCheck,
   Sparkles,
-  Store,
   ArrowUpRight,
   CalendarDays,
   CreditCard,
@@ -16,6 +15,7 @@ import {
 
 import { authClient } from "@/lib/auth-client";
 import { getVendorServices } from "@/lib/api/service-api";
+import { fetchWithAuth } from "@/lib/api/api-client";
 import type { Service } from "@/types/service";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -83,10 +83,12 @@ export default function VendorSubscriptionPage() {
       }
 
       try {
-        const response = await fetch(`${API_URL}/payments/subscription`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetchWithAuth(
+          `${API_URL}/payments/subscription`,
+          {
+            method: "GET",
+          },
+        );
 
         const result: SubscriptionResponse = await response.json();
 
@@ -167,11 +169,10 @@ export default function VendorSubscriptionPage() {
     setCheckoutError("");
 
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_URL}/payments/create-checkout-session`,
         {
           method: "POST",
-          credentials: "include",
         },
       );
 

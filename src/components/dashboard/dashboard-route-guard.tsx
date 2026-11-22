@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Role } from "@/components/dashboard/dashboard-sidebar";
 
 interface DashboardRouteGuardProps {
-  role: Role;
+  role: Role | null;
   isPending: boolean;
   hasUser: boolean;
 }
@@ -33,7 +33,7 @@ function RouteGuardContent({
   useEffect(() => {
     if (isPending) return;
 
-    if (!hasUser) {
+    if (!hasUser || !role) {
       router.replace("/login");
       return;
     }

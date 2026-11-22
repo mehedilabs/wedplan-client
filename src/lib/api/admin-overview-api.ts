@@ -1,4 +1,5 @@
 import type { AdminOverviewStats } from "@/types/admin-overview";
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -10,12 +11,11 @@ interface ApiMessageResponse {
  * Fetch platform overview metrics for the admin dashboard
  */
 export async function getAdminOverview(): Promise<AdminOverviewStats> {
-  const response = await fetch(`${API_URL}/admin/overview`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/overview`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     cache: "no-store",
   });
 

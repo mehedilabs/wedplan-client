@@ -3,6 +3,7 @@ import type {
   AdminUserRole,
   AdminUserStatus,
 } from "@/types/admin-user";
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -14,12 +15,11 @@ interface ApiMessageResponse {
  * Fetch all registered users for the admin dashboard
  */
 export async function getAdminUsers(): Promise<AdminUser[]> {
-  const response = await fetch(`${API_URL}/admin/users`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/users`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     cache: "no-store",
   });
 
@@ -42,12 +42,11 @@ export async function getAdminUsers(): Promise<AdminUser[]> {
  * Fetch a single user by ID
  */
 export async function getAdminUserById(id: string): Promise<AdminUser> {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/users/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     cache: "no-store",
   });
 
@@ -73,12 +72,11 @@ export async function updateAdminUserStatus(
   id: string,
   status: AdminUserStatus,
 ): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/users/${id}/status`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/users/${id}/status`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify({ status }),
   });
 
@@ -100,12 +98,11 @@ export async function updateAdminUserRole(
   id: string,
   role: AdminUserRole,
 ): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/users/${id}/role`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/users/${id}/role`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify({ role }),
   });
 
@@ -124,12 +121,11 @@ export async function updateAdminUserRole(
  * Delete a user
  */
 export async function deleteAdminUser(id: string): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/users/${id}`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/users/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
   });
 
   const data: ApiMessageResponse = await response.json().catch(() => ({

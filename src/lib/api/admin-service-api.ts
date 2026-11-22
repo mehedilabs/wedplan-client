@@ -1,4 +1,5 @@
 import type { Service } from "@/types/service";
+import { fetchWithAuth } from "./api-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -10,12 +11,11 @@ interface ApiMessageResponse {
  * Fetch all submitted services for the admin dashboard
  */
 export async function getAdminServices(): Promise<Service[]> {
-  const response = await fetch(`${API_URL}/admin/services`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/services`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     cache: "no-store",
   });
 
@@ -41,14 +41,16 @@ export async function updateAdminServiceStatus(
   id: string,
   status: "approved" | "rejected",
 ): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/services/${id}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetchWithAuth(
+    `${API_URL}/admin/services/${id}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
     },
-    credentials: "include",
-    body: JSON.stringify({ status }),
-  });
+  );
 
   const data: ApiMessageResponse = await response.json().catch(() => ({
     message: "Failed to update service status",
@@ -68,14 +70,16 @@ export async function updateAdminServiceActive(
   id: string,
   isActive: boolean,
 ): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/services/${id}/active`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetchWithAuth(
+    `${API_URL}/admin/services/${id}/active`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isActive }),
     },
-    credentials: "include",
-    body: JSON.stringify({ isActive }),
-  });
+  );
 
   const data: ApiMessageResponse = await response.json().catch(() => ({
     message: "Failed to update service availability",
@@ -95,12 +99,11 @@ export async function updateAdminServiceActive(
  * Delete a service
  */
 export async function deleteAdminService(id: string): Promise<string> {
-  const response = await fetch(`${API_URL}/admin/services/${id}`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/services/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
   });
 
   const data: ApiMessageResponse = await response.json().catch(() => ({

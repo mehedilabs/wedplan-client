@@ -8,9 +8,9 @@ import { DashboardLoader } from "@/components/dashboard/dashboard-loader";
 
 type DashboardRole = "vendor" | "admin" | "customer";
 
-function resolveRole(role?: string): DashboardRole {
-  if (role === "vendor" || role === "admin") return role;
-  return "customer";
+function resolveRole(role?: string): DashboardRole | null {
+  if (role === "vendor" || role === "admin" || role === "customer") return role;
+  return null;
 }
 
 export default function DashboardIndexPage() {
