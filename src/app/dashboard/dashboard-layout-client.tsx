@@ -14,7 +14,6 @@ import {
 } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardLoader } from "@/components/dashboard/dashboard-loader";
-import DashboardRouteGuard from "@/components/dashboard/dashboard-route-guard";
 
 function DashboardSidebarSkeleton() {
   return (
@@ -103,8 +102,6 @@ export default function DashboardLayoutClient({
 
   return (
     <>
-      <DashboardRouteGuard role={role} isPending={isPending} hasUser={!!user} />
-
       <SidebarProvider defaultOpen={true}>
         {isPending ? (
           <DashboardSidebarSkeleton />
