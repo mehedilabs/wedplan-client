@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Sparkles } from "lucide-react";
 import ServicesContent from "./_components/services-content";
+
+export const metadata: Metadata = {
+  title: "Browse Services",
+};
 
 function ServicesLoading() {
   return (

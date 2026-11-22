@@ -21,11 +21,9 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "WedPlan | Wedding Planning Made Simple",
-    template: "%s | WedPlan",
+    default: "WedPlan - Make Your Wedding Unforgettable",
+    template: "WedPlan | %s",
   },
-  description:
-    "Plan your perfect wedding with WedPlan. Discover wedding services and bring your dream celebration to life.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
