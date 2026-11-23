@@ -4,6 +4,7 @@ export interface Service {
   _id: string;
   vendorId: string;
   vendorName: string;
+  vendorImage?: string | null;
   vendorEmail: string;
   serviceName: string;
   category: string;

@@ -107,13 +107,25 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             <div className="flex min-w-0 items-center gap-3">
               {/* Avatar with crown badge for premium */}
               <span className="relative shrink-0">
-                <span
-                  className={`flex size-10 items-center justify-center rounded-full bg-primary/10 font-heading text-lg font-semibold text-primary ring-2 ${
-                    isPremium ? "ring-accent" : "ring-accent/40"
-                  }`}
-                >
-                  {vendorInitial}
-                </span>
+                {service.vendorImage ? (
+                  <Image
+                    src={service.vendorImage}
+                    alt={`${vendorName ?? "Vendor"} profile`}
+                    width={40}
+                    height={40}
+                    className={`size-10 rounded-full object-cover ring-2 ${
+                      isPremium ? "ring-accent" : "ring-accent/40"
+                    }`}
+                  />
+                ) : (
+                  <span
+                    className={`flex size-10 items-center justify-center rounded-full bg-primary/10 font-heading text-lg font-semibold text-primary ring-2 ${
+                      isPremium ? "ring-accent" : "ring-accent/40"
+                    }`}
+                  >
+                    {vendorInitial}
+                  </span>
+                )}
 
                 {isPremium && (
                   <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-accent text-accent-foreground shadow-sm">

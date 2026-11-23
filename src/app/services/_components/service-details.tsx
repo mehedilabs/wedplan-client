@@ -44,6 +44,7 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
   const userRole = session?.user?.role;
   const isVendor = userRole === "vendor";
   const isCustomer = userRole === "customer";
+  const isAdmin = userRole === "admin";
 
   // Check existing booking status from the database
 
@@ -304,13 +305,25 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                   }`}
                 >
                   <span className="relative shrink-0">
-                    <span
-                      className={`flex size-10 items-center justify-center rounded-full bg-primary font-heading text-lg font-semibold text-primary-foreground ring-2 ${
-                        isPremium ? "ring-accent" : "ring-accent/40"
-                      }`}
-                    >
-                      {vendorInitial}
-                    </span>
+                    {service.vendorImage ? (
+                      <Image
+                        src={service.vendorImage}
+                        alt={`${service.vendorName ?? "Vendor"} profile`}
+                        width={40}
+                        height={40}
+                        className={`size-10 rounded-full object-cover ring-2 ${
+                          isPremium ? "ring-accent" : "ring-accent/40"
+                        }`}
+                      />
+                    ) : (
+                      <span
+                        className={`flex size-10 items-center justify-center rounded-full bg-primary font-heading text-lg font-semibold text-primary-foreground ring-2 ${
+                          isPremium ? "ring-accent" : "ring-accent/40"
+                        }`}
+                      >
+                        {vendorInitial}
+                      </span>
+                    )}
 
                     {isPremium && (
                       <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-accent text-accent-foreground shadow-sm">
@@ -369,6 +382,23 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                       <p className="mt-1 text-sm leading-6 text-muted-foreground">
                         Vendor accounts cannot submit customer booking requests.
                         Please sign in with a Customer account to book services.
+                      </p>
+                    </div>
+                  </div>
+                ) : isAdmin ? (
+                  <div className="flex items-start gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent">
+                      <Info className="size-4" />
+                    </span>
+
+                    <div>
+                      <h2 className="font-heading text-lg font-semibold text-foreground">
+                        Booking Unavailable
+                      </h2>
+
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        Admin accounts cannot submit booking requests. Please
+                        use a Customer account to book this service.
                       </p>
                     </div>
                   </div>
